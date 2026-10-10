@@ -59,7 +59,12 @@ w(
   "2. **El núcleo del backend va separado de la API REST.** La lógica de negocio y el acceso a datos no dependen de la web: la API es un cliente más del núcleo.",
   "3. **Entity frente a DTO.** Las entidades nunca salen del backend: la API recibe y devuelve DTO, solo con los campos necesarios. Nunca se exponen contraseñas, documentos, datos bancarios ni datos de tarjeta.",
   "4. **Un paquete por módulo**, alineado con las épicas: `cuentas`, `espacios`, `busqueda`, `reservas`, `pagos`, `administracion`. Cada uno tiene `controller`, `service`, `repository`, `entity` y `dto`.",
-  "5. **POO, principios y patrones.** Aplicar SOLID, alta cohesión y bajo acoplamiento. Usar patrones solo donde resuelvan un problema real (por ejemplo, Repository o DAO para la persistencia, o Strategy para el cálculo del reembolso o de la comisión). Cada patrón se documenta en la sección 7.7 del informe con dónde está y por qué.",
+  "5. **POO, principios y patrones.**",
+  "   - Aplicar SOLID, alta cohesión y bajo acoplamiento.",
+  "   - Patrones vistos en el curso: Factory Method, Abstract Factory, Singleton, Adapter, Facade, Decorator, Bridge, Strategy, Iterator, Command y DAO.",
+  "   - Usarlos solo donde resuelvan un problema real; la sección 10 indica cuáles se esperan en las historias documentadas.",
+  "   - DAO/Repository se usa en toda la persistencia. Los beans de Spring ya son *singleton*: no se programa un Singleton a mano.",
+  "   - Cada patrón se documenta en la sección 7.7 del informe, con dónde está y por qué.",
   "6. **Reglas de negocio y montos solo en el servidor.** El cliente nunca decide montos, roles ni estados.",
   "",
   "**Convenciones de código (propuesta inicial; el equipo puede ajustarlas):**",
@@ -158,6 +163,7 @@ w(
   "## 9. Historias de usuario",
   "",
   "Fuente: Excel del backlog. Cada historia indica su dueño, la persona que la prueba y la semana real en que se hace.",
+  "Las historias que se documentan a fondo tienen además los patrones que se espera aplicar (ver la sección 10).",
   "",
 );
 
@@ -171,6 +177,8 @@ for (const [letra, epica] of Object.entries(B.epicas)) {
       "",
       `- **Release ${h.release} · Sprint ${h.sprint}** (semana ${semanaDe(h.id)}) · tamaño ${h.tamano} · depende de: ${h.dependeTexto}`,
       `- **Programa:** ${nombre(dueno)} · **Prueba y documenta:** ${nombre(pareja)}`,
+      ...(P.documentadas[h.id] ? [`- **Se documenta a fondo (capítulo 8).** Patrones: ${P.documentadas[h.id].patrones.join(", ")}.`] : []),
+      ...(P.sprintsVideo.includes(h.sprint) ? ["- **Sale en el video** de su release."] : []),
       "",
       h.descripcion,
       "",
@@ -185,6 +193,20 @@ for (const [letra, epica] of Object.entries(B.epicas)) {
     );
   }
 }
+
+w(
+  "## 10. Historias documentadas a fondo y patrones de diseño",
+  "",
+  "El profesor pide exponer **una historia por integrante**. Estas 6 se documentan completas en el capítulo 8 (escenario, diagrama de secuencia, código, tabla mensaje → método) y su patrón va en la sección 7.7.",
+  `Salen de los sprints que se graban en video: el **Sprint ${P.sprintsVideo[0]} del R1** y el **Sprint ${P.sprintsVideo[1]} del R2**.`,
+  "",
+  "| Historia | Dueño | Patrones | Cómo se aplican |",
+  "| --- | --- | --- | --- |",
+  ...Object.entries(P.documentadas).map(([c, d]) => `| ${c} · ${B.historias[c].titulo} | ${nombre(P.asignacion[c])} | ${d.patrones.join(", ")} | ${d.porque} |`),
+  "",
+  "Al diseñar estas historias, pide a tu IA que aplique estos patrones y que lo muestre en el diagrama de clases y en el de secuencia. Los patrones de arquitectura se agregarán aquí cuando el equipo los defina.",
+  "",
+);
 
 fs.writeFileSync(path.join(raiz, "proyecto.md"), lineas.join("\n"), "utf8");
 console.log(`proyecto.md generado: ${lineas.length} líneas, ${Object.keys(B.historias).length} historias`);

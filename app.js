@@ -351,7 +351,13 @@
         relacionadas.length ? listaTareas(relacionadas) : null,
         h("button", { type: "button", class: "ir-esp", "data-esp": codigo, text: "Ver en la especificación" }));
       return h("tr", { id: `hu-${codigo}` },
-        h("td", {}, h("strong", { class: "hu-cod", text: codigo }), h("span", { class: "hu-tit", text: info.titulo }), detalles),
+        h("td", {}, h("strong", { class: "hu-cod", text: codigo }), h("span", { class: "hu-tit", text: info.titulo }),
+          PLAN.documentadas[codigo] || PLAN.sprintsVideo.includes(info.sprint)
+            ? h("div", { class: "marcas" },
+                PLAN.documentadas[codigo] ? h("span", { class: "marca-doc", text: "Se documenta a fondo · " + PLAN.documentadas[codigo].patrones.join(", ") }) : null,
+                PLAN.sprintsVideo.includes(info.sprint) ? h("span", { class: "marca-video", text: "Sale en el video" }) : null)
+            : null,
+          detalles),
         h("td", {}, h("span", { text: semanaDe[sid].titulo.replace("Semana", "Sem.") }), h("span", { class: "sub", text: `R${info.release} · Sprint ${info.sprint} · ${info.tamano}` })),
         h("td", {}, h("div", { class: "paso" }, chipPersona(p.cod.personas[0])),
           h("div", { class: "paso" }, h("span", { class: "sub-texto", text: "Diseño" }), pill(p.e.dis)),
@@ -368,6 +374,15 @@
         h("h2", { text: "Cómo avanza cada historia" }),
         h("p", {}, "Cada semana de trabajo cubre dos sprints del backlog; las historias del primer sprint van primero. Cada historia pasa por tres pasos, y cada paso alimenta secciones del informe. Las parejas son fijas y cada una prueba las historias de la otra: ", h("strong", { text: parejas }), "."),
         flujo),
+      h("div", { class: "bloque" },
+        h("h2", { text: "Las 6 historias que se documentan a fondo" }),
+        h("p", {}, "Una por persona, elegidas porque en ellas encajan mejor los patrones de diseño del curso. Salen de los dos sprints que se graban: el ",
+          h("strong", { text: "Sprint " + PLAN.sprintsVideo[0] + " del R1" }), " (video 1) y el ", h("strong", { text: "Sprint " + PLAN.sprintsVideo[1] + " del R2" }),
+          " (video 2). Las demás historias igual llevan su diseño, pruebas y evidencias; solo estas 6 van completas al capítulo 8."),
+        h("div", { class: "documentadas" }, Object.entries(PLAN.documentadas).map(([codigo, d]) => h("div", { class: "box-doc" },
+          h("div", { class: "paso-cab" }, botonHU(codigo), h("strong", { text: PLAN.hu[codigo].titulo }), chipPersona(PLAN.asignacion[codigo])),
+          h("div", { class: "meta" }, d.patrones.map((p) => h("span", { class: "tag tag-patron", text: p }))),
+          h("p", { class: "sub-texto", text: d.porque }))))),
       h("div", { class: "bloque" },
         h("div", { class: "semana-cab" }, h("h2", { text: "Trazabilidad de las historias" }), h("span", { class: "cuenta", text: `${listas} de ${orden.length} listas` })),
         h("p", { class: "sub-texto", text: "\"Depende de\" indica qué historias tienen que existir antes, según el backlog. Toca un código para ir a esa historia, o una sección (§) para verla en el informe." }),
@@ -476,8 +491,7 @@
         h("h2", { text: "Por definir" }),
         lista("ul", [
           "La base de datos: es una decisión de arquitectura (Spring Boot y Angular ya están decididos).",
-          "Qué sprint del Release 1 y cuál del Release 2 se graban en video.",
-          "Qué historia documenta a fondo cada persona en el capítulo 8.",
+          "Los patrones de arquitectura que se van a aplicar (además de las capas y Entity frente a DTO).",
           "Las fechas reales de cada sprint para el informe: cada semana tiene dos sprints del backlog.",
           "Duración y formato de los videos (preguntarle al profesor).",
         ])));

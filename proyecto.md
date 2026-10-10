@@ -19,10 +19,10 @@ Marketplace web para alquilar espacios deportivos y para eventos (canchas, estad
 
 | Persona | Rol Scrum | Historias que diseña y programa | Su pareja (prueba sus historias) |
 | --- | --- | --- | --- |
-| Jorge Quispe | Developer (Dev1) | HU-01, HU-03, HU-09, HU-17, HU-27 | Kevin Chan |
+| Jorge Quispe | Developer (Dev1) | HU-01, HU-03, HU-09, HU-17, HU-25 | Kevin Chan |
 | Adriana Callupe | Developer (Dev3) | HU-02, HU-11, HU-14, HU-20, HU-24 | Sebastian Garate |
 | Eduardo Saldaña | Developer (Dev2) | HU-04, HU-12, HU-13, HU-19, HU-28 | Ariel Enriquez |
-| Kevin Chan | Scrum Master | HU-05, HU-15, HU-22, HU-25 | Jorge Quispe |
+| Kevin Chan | Scrum Master | HU-05, HU-15, HU-22, HU-27 | Jorge Quispe |
 | Sebastian Garate | Developer (Dev4) | HU-07, HU-08, HU-10, HU-21, HU-23 | Adriana Callupe |
 | Ariel Enriquez | Product Owner | HU-06, HU-16, HU-18, HU-26 | Eduardo Saldaña |
 
@@ -46,7 +46,12 @@ Marketplace web para alquilar espacios deportivos y para eventos (canchas, estad
 2. **El núcleo del backend va separado de la API REST.** La lógica de negocio y el acceso a datos no dependen de la web: la API es un cliente más del núcleo.
 3. **Entity frente a DTO.** Las entidades nunca salen del backend: la API recibe y devuelve DTO, solo con los campos necesarios. Nunca se exponen contraseñas, documentos, datos bancarios ni datos de tarjeta.
 4. **Un paquete por módulo**, alineado con las épicas: `cuentas`, `espacios`, `busqueda`, `reservas`, `pagos`, `administracion`. Cada uno tiene `controller`, `service`, `repository`, `entity` y `dto`.
-5. **POO, principios y patrones.** Aplicar SOLID, alta cohesión y bajo acoplamiento. Usar patrones solo donde resuelvan un problema real (por ejemplo, Repository o DAO para la persistencia, o Strategy para el cálculo del reembolso o de la comisión). Cada patrón se documenta en la sección 7.7 del informe con dónde está y por qué.
+5. **POO, principios y patrones.**
+   - Aplicar SOLID, alta cohesión y bajo acoplamiento.
+   - Patrones vistos en el curso: Factory Method, Abstract Factory, Singleton, Adapter, Facade, Decorator, Bridge, Strategy, Iterator, Command y DAO.
+   - Usarlos solo donde resuelvan un problema real; la sección 10 indica cuáles se esperan en las historias documentadas.
+   - DAO/Repository se usa en toda la persistencia. Los beans de Spring ya son *singleton*: no se programa un Singleton a mano.
+   - Cada patrón se documenta en la sección 7.7 del informe, con dónde está y por qué.
 6. **Reglas de negocio y montos solo en el servidor.** El cliente nunca decide montos, roles ni estados.
 
 **Convenciones de código (propuesta inicial; el equipo puede ajustarlas):**
@@ -165,6 +170,7 @@ La semana 12 es de estabilización (pruebas, defectos e informe), y la entrega e
 ## 9. Historias de usuario
 
 Fuente: Excel del backlog. Cada historia indica su dueño, la persona que la prueba y la semana real en que se hace.
+Las historias que se documentan a fondo tienen además los patrones que se espera aplicar (ver la sección 10).
 
 ### Épica A. Gestión de cuentas y autenticación
 
@@ -432,6 +438,8 @@ Como usuario, necesito ver la ficha de un espacio con sus fotos, datos y bloques
 
 - **Release 2 · Sprint 7** (semana 11) · tamaño S · depende de: HU-07, HU-10
 - **Programa:** Sebastian Garate · **Prueba y documenta:** Adriana Callupe
+- **Se documenta a fondo (capítulo 8).** Patrones: Decorator.
+- **Sale en el video** de su release.
 
 Como usuario, necesito filtrar los resultados por precio máximo, capacidad mínima y características (techado, iluminación, vestuarios, estacionamiento), para encontrar el espacio que se ajusta a lo que necesito.
 
@@ -450,6 +458,7 @@ Como usuario, necesito filtrar los resultados por precio máximo, capacidad mín
 
 - **Release 2 · Sprint 7** (semana 11) · tamaño M · depende de: HU-14
 - **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Sale en el video** de su release.
 
 Como usuario que usó un espacio, necesito calificarlo de 1 a 5 y dejar un comentario, para ayudar a otros a elegir con confianza.
 
@@ -494,6 +503,8 @@ Como usuario autenticado, necesito elegir uno o más bloques consecutivos y rese
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño S · depende de: HU-12, HU-13
 - **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Se documenta a fondo (capítulo 8).** Patrones: Iterator, DAO.
+- **Sale en el video** de su release.
 
 Como usuario o arrendador, necesito ver mis reservas próximas y pasadas con su estado, para saber qué tengo reservado o qué me han reservado.
 
@@ -511,6 +522,8 @@ Como usuario o arrendador, necesito ver mis reservas próximas y pasadas con su 
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño S · depende de: HU-13, HU-14
 - **Programa:** Kevin Chan · **Prueba y documenta:** Jorge Quispe
+- **Se documenta a fondo (capítulo 8).** Patrones: Strategy.
+- **Sale en el video** de su release.
 
 Como usuario o arrendador, necesito cancelar una reserva confirmada según una política fija, para liberar el horario sabiendo de antemano cuánto se devuelve.
 
@@ -530,7 +543,9 @@ Como usuario o arrendador, necesito cancelar una reserva confirmada según una p
 #### HU-25 · Recordatorio de reserva por correo
 
 - **Release 2 · Sprint 7** (semana 11) · tamaño S · depende de: HU-13
-- **Programa:** Kevin Chan · **Prueba y documenta:** Jorge Quispe
+- **Programa:** Jorge Quispe · **Prueba y documenta:** Kevin Chan
+- **Se documenta a fondo (capítulo 8).** Patrones: Factory Method, Adapter.
+- **Sale en el video** de su release.
 
 Como usuario o arrendador, necesito recibir un recordatorio por correo 24 h antes de cada reserva, para no olvidarla.
 
@@ -553,6 +568,8 @@ Gestiona el cobro con tarjeta vía pasarela certificada PCI DSS, los reembolsos,
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño M · depende de: HU-12
 - **Programa:** Eduardo Saldaña · **Prueba y documenta:** Ariel Enriquez
+- **Se documenta a fondo (capítulo 8).** Patrones: Adapter, Factory Method, Facade.
+- **Sale en el video** de su release.
 
 Como usuario, necesito pagar mi reserva pendiente con tarjeta, para confirmarla.
 
@@ -575,6 +592,8 @@ Como usuario, necesito pagar mi reserva pendiente con tarjeta, para confirmarla.
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño S · depende de: HU-13, HU-15
 - **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
+- **Se documenta a fondo (capítulo 8).** Patrones: Command, Adapter.
+- **Sale en el video** de su release.
 
 Como usuario, necesito recibir automáticamente el reembolso que corresponde cuando se cancela mi reserva, para recuperar mi dinero sin tener que reclamarlo.
 
@@ -711,7 +730,7 @@ Como usuario, necesito reportar un problema con una reserva (espacio cerrado, di
 #### HU-27 · Reportes y moderación de publicaciones y reseñas
 
 - **Release 2 · Sprint 8** (semana 11) · tamaño M · depende de: HU-09, HU-17, HU-24
-- **Programa:** Jorge Quispe · **Prueba y documenta:** Kevin Chan
+- **Programa:** Kevin Chan · **Prueba y documenta:** Jorge Quispe
 
 Como administrador, necesito recibir reportes de usuarios sobre publicaciones o reseñas y ocultarlas o mantenerlas, para sacar del catálogo el contenido fraudulento o inapropiado.
 
@@ -726,3 +745,19 @@ Como administrador, necesito recibir reportes de usuarios sobre publicaciones o 
 - (E/S) Solo admins con MFA (HU-17).
 - (D) Máximo 10 reportes por usuario al día.
 - (R) Registro de reportes y acciones.
+
+## 10. Historias documentadas a fondo y patrones de diseño
+
+El profesor pide exponer **una historia por integrante**. Estas 6 se documentan completas en el capítulo 8 (escenario, diagrama de secuencia, código, tabla mensaje → método) y su patrón va en la sección 7.7.
+Salen de los sprints que se graban en video: el **Sprint 4 del R1** y el **Sprint 7 del R2**.
+
+| Historia | Dueño | Patrones | Cómo se aplican |
+| --- | --- | --- | --- |
+| HU-13 · Pago con tarjeta | Eduardo Saldaña | Adapter, Factory Method, Facade | Adapter: una interfaz propia PasarelaPago y un adaptador que traduce la API de la pasarela (checkout y verificación de la firma del webhook), para que el dominio no dependa del proveedor. Factory Method para crear la pasarela según la configuración (sandbox o real) y Facade (CheckoutFacade) para el flujo reserva vigente → monto en servidor → checkout. |
+| HU-14 · Mis reservas | Adriana Callupe | Iterator, DAO | Iterator: recorrer las reservas del usuario separadas en próximas y pasadas sin exponer la colección ni la consulta. DAO/Repository: consultas filtradas siempre por el usuario de la sesión (control STRIDE E/I). |
+| HU-15 · Cancelación de reservas | Kevin Chan | Strategy | Strategy: una interfaz PoliticaReembolso con una estrategia por caso (usuario con 48 h o más → 100 %, usuario con menos de 48 h → 0 %, arrendador → 100 %). El servicio elige la estrategia sin if por tipo, y si la política deja de ser fija solo se agrega una estrategia. |
+| HU-16 · Reembolso automático | Ariel Enriquez | Command, Adapter | Command: cada reembolso es un objeto (SolicitudReembolso) con ejecutar(), que se registra, es idempotente y se puede reintentar con el botón del admin cuando falla. Reutiliza el Adapter de la pasarela de HU-13. |
+| HU-23 · Filtros de búsqueda por precio, capacidad y características | Sebastian Garate | Decorator | Decorator: cada filtro (precio máximo, capacidad mínima, característica) envuelve a la búsqueda base de HU-10 y se pueden combinar libremente, sin una subclase por cada combinación de filtros. |
+| HU-25 · Recordatorio de reserva por correo | Jorge Quispe | Factory Method, Adapter | Factory Method: crear el correo adecuado según el evento (recordatorio, pago confirmado, cancelación); solo el recordatorio respeta la preferencia de desactivarlo. Adapter para el proveedor de correo, que así se puede cambiar sin tocar el dominio. |
+
+Al diseñar estas historias, pide a tu IA que aplique estos patrones y que lo muestre en el diagrama de clases y en el de secuencia. Los patrones de arquitectura se agregarán aquí cuando el equipo los defina.

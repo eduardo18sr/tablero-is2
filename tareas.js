@@ -27,9 +27,29 @@
     "HU-01": "p1", "HU-02": "p2", "HU-03": "p1", "HU-04": "p3", "HU-05": "p4", "HU-06": "p6", "HU-07": "p5", "HU-08": "p5",
     "HU-09": "p1", "HU-10": "p5", "HU-11": "p2", "HU-12": "p3", "HU-13": "p3", "HU-14": "p2", "HU-15": "p4", "HU-16": "p6",
     "HU-17": "p1", "HU-18": "p6", "HU-19": "p3", "HU-20": "p2", "HU-21": "p5", "HU-22": "p4",
-    "HU-23": "p5", "HU-24": "p2", "HU-25": "p4", "HU-26": "p6", "HU-27": "p1", "HU-28": "p3",
+    "HU-23": "p5", "HU-24": "p2", "HU-25": "p1", "HU-26": "p6", "HU-27": "p4", "HU-28": "p3",
   };
   for (const p of personas) p.historias = Object.keys(asignacion).filter((c) => asignacion[c] === p.id);
+
+  // Sprints que se graban en video (uno por release).
+  const sprintsVideo = [4, 7];
+
+  // Las 6 historias que se documentan a fondo (una por persona), elegidas por los patrones de diseño
+  // del curso que mejor encajan en ellas. Todas están en los sprints del video.
+  const documentadas = {
+    "HU-13": { patrones: ["Adapter", "Factory Method", "Facade"],
+      porque: "Adapter: una interfaz propia PasarelaPago y un adaptador que traduce la API de la pasarela (checkout y verificación de la firma del webhook), para que el dominio no dependa del proveedor. Factory Method para crear la pasarela según la configuración (sandbox o real) y Facade (CheckoutFacade) para el flujo reserva vigente → monto en servidor → checkout." },
+    "HU-14": { patrones: ["Iterator", "DAO"],
+      porque: "Iterator: recorrer las reservas del usuario separadas en próximas y pasadas sin exponer la colección ni la consulta. DAO/Repository: consultas filtradas siempre por el usuario de la sesión (control STRIDE E/I)." },
+    "HU-15": { patrones: ["Strategy"],
+      porque: "Strategy: una interfaz PoliticaReembolso con una estrategia por caso (usuario con 48 h o más → 100 %, usuario con menos de 48 h → 0 %, arrendador → 100 %). El servicio elige la estrategia sin if por tipo, y si la política deja de ser fija solo se agrega una estrategia." },
+    "HU-16": { patrones: ["Command", "Adapter"],
+      porque: "Command: cada reembolso es un objeto (SolicitudReembolso) con ejecutar(), que se registra, es idempotente y se puede reintentar con el botón del admin cuando falla. Reutiliza el Adapter de la pasarela de HU-13." },
+    "HU-23": { patrones: ["Decorator"],
+      porque: "Decorator: cada filtro (precio máximo, capacidad mínima, característica) envuelve a la búsqueda base de HU-10 y se pueden combinar libremente, sin una subclase por cada combinación de filtros." },
+    "HU-25": { patrones: ["Factory Method", "Adapter"],
+      porque: "Factory Method: crear el correo adecuado según el evento (recordatorio, pago confirmado, cancelación); solo el recordatorio respeta la preferencia de desactivarlo. Adapter para el proveedor de correo, que así se puede cambiar sin tocar el dominio." },
+  };
 
   // Rangos de fechas aproximados (la semana empieza el lunes). Ajústenlos al calendario de la universidad.
   const semanas = [
@@ -197,9 +217,9 @@
     { id: "s9-cap5", semana: "s9", personas: ["p6"], tipo: "Informe", titulo: "Capítulo 5: backlog, historias y criterios",
       secciones: ["5.1", "5.2", "5.3", "5.6"],
       detalle: "Backlog priorizado, historias con criterios verificables y la matriz de trazabilidad con las filas de HU-01 a HU-08 (ver la pestaña Historias)." },
-    { id: "s9-video1", semana: "s9", personas: ["equipo"], tipo: "Video", titulo: "Grabar el video 1 (un sprint del Release 1)", cuando: "Viernes",
-      secciones: ["13.2"],
-      detalle: "En la review: objetivo y backlog del sprint, demo de cada historia con sus criterios (incluido un caso de error), pruebas automáticas corriendo, Burn Down y una conclusión de la retro. Usar los datos semilla." },
+    { id: "s9-video1", semana: "s9", personas: ["equipo"], tipo: "Video", titulo: "Grabar el video 1 (Sprint 4 del Release 1)", cuando: "Viernes",
+      hu: ["HU-13", "HU-14", "HU-15", "HU-16"], secciones: ["13.2"],
+      detalle: "Sprint 4 \"Pagar, consultar, cancelar y reembolsar\": pagar en el checkout de prueba, ver Mis reservas, cancelar y recibir el reembolso. Guion: objetivo y backlog del sprint, demo de cada historia con sus criterios (incluido un caso de error), pruebas automáticas corriendo, Burn Down y una conclusión de la retro. Cada dueño presenta su historia y menciona el patrón que aplicó." },
     { id: "s9-cierre-r1", semana: "s9", personas: ["p4"], tipo: "Scrum", titulo: "Cierre del Release 1 y etiqueta v1.0",
       secciones: ["4.R"],
       detalle: "Acta de cierre del release: el ciclo publicar → buscar → reservar → pagar → cancelar con reembolso funciona. Merge a main y etiqueta v1.0." },
@@ -216,9 +236,9 @@
     { id: "s11-cap10", semana: "s11", personas: ["p5"], tipo: "Informe", titulo: "Capítulo 10: estrategia de pruebas",
       secciones: ["10.1"],
       detalle: "Qué se prueba con pruebas unitarias, de caja blanca y de caja negra, con qué herramientas, y la plantilla del registro de defectos." },
-    { id: "s11-video2", semana: "s11", personas: ["equipo"], tipo: "Video", titulo: "Grabar el video 2 (un sprint del Release 2)", cuando: "Viernes",
-      secciones: ["13.2"],
-      detalle: "Mismo guion que el video 1." },
+    { id: "s11-video2", semana: "s11", personas: ["equipo"], tipo: "Video", titulo: "Grabar el video 2 (Sprint 7 del Release 2)", cuando: "Viernes",
+      hu: ["HU-23", "HU-24", "HU-25"], secciones: ["13.2"],
+      detalle: "Sprint 7 \"Descubrimiento y confianza\": filtros combinados, reseñas y el correo de recordatorio. Mismo guion que el video 1." },
     { id: "s11-cierre-r2", semana: "s11", personas: ["p4"], tipo: "Scrum", titulo: "Cierre del Release 2 y etiqueta v2.0",
       secciones: ["4.R"],
       detalle: "Acta de cierre del release, merge a main y etiqueta v2.0." },
@@ -317,9 +337,12 @@
       titulo: "Evaluación por pares del Release 1", detalle: "Informe de Actividad y Calificación por Pares del R1, en el formato oficial. Se adjunta en los anexos." });
     tareas.push({ id: `s11-pares-r2-${p.id}`, semana: "s11", personas: [p.id], tipo: "Entrega", secciones: ["2.4.5", "13.2"],
       titulo: "Evaluación por pares del Release 2", detalle: "Informe de Actividad y Calificación por Pares del R2, en el formato oficial." });
-    tareas.push({ id: `s12-doc-hu-${p.id}`, semana: "s12", personas: [p.id], tipo: "Informe", secciones: ["8.1", "8.1.2"],
-      titulo: "Documentar a fondo tu historia asignada (capítulo 8)",
-      detalle: "Con el diagrama de secuencia que ya hiciste al diseñar y tu código: fragmentos de código por mensaje, tabla mensaje → método, explicación y referencias al repositorio (prompt \"Correspondencia diagrama-código\")." });
+    const suya = Object.keys(documentadas).find((c) => asignacion[c] === p.id);
+    const semanaCodigo = bloques.find((b) => b.historias.includes(suya)).semana;
+    const semanaDoc = semanaCodigo === "s9" ? "s10" : "s12";   // la semana siguiente a programarla
+    tareas.push({ id: `${semanaDoc}-doc-hu-${p.id}`, semana: semanaDoc, personas: [p.id], tipo: "Informe", hu: [suya], secciones: ["7.7", "8.1", "8.1.1", "8.1.2"],
+      titulo: `Documentar a fondo ${suya} (capítulo 8) · ${documentadas[suya].patrones.join(", ")}`,
+      detalle: `${documentadas[suya].porque} Con el diagrama de secuencia que hiciste al diseñar y tu código: escenario, fragmentos de código por mensaje, tabla mensaje → método, explicación y referencias al repositorio (prompt "Correspondencia diagrama-código"). El patrón también va en la sección 7.7.` });
     tareas.push({ id: `s12-contribucion-${p.id}`, semana: "s12", personas: [p.id], tipo: "Informe", secciones: ["2.4.5"],
       titulo: "Tu ficha de contribución individual", detalle: "Actividades, responsabilidades, aportes al código y colaboración en R1 y R2, cada afirmación con su código de evidencia." });
     tareas.push({ id: `s12-impacto-${p.id}`, semana: "s12", personas: [p.id], tipo: "Informe", secciones: ["13.2"],
@@ -352,5 +375,5 @@
     ],
   };
 
-  window.PLAN = { entrega: "2026-11-16", personas, asignacion, hu, epicas: BACKLOG.epicas, semanas, bloques, pasos, informe, ia, tareas };
+  window.PLAN = { entrega: "2026-11-16", personas, asignacion, hu, epicas: BACKLOG.epicas, semanas, bloques, pasos, informe, ia, tareas, sprintsVideo, documentadas };
 })();

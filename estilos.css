@@ -226,3 +226,12 @@ a.boton { display: inline-flex; align-items: center; text-decoration: none; }
 .md .tabla table { min-width: 560px; }
 .pestanas { overflow-x: auto; scrollbar-width: thin; }
 .pestanas button { white-space: nowrap; flex: none; }
+
+/* Historias documentadas */
+.documentadas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.box-doc { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--hecho); border-radius: 0 8px 8px 0; padding: 12px 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.tag-patron { background: var(--hecho-bg); color: var(--hecho); }
+.marcas { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.marca-doc, .marca-video { font-size: .74rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+.marca-doc { background: var(--hecho-bg); color: var(--hecho); }
+.marca-video { background: var(--curso-bg); color: var(--curso); }
