@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tablero IS2</title>
+<meta name="description" content="Tareas del equipo para el Proyecto Final de Ingeniería de Software II.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="cabecera">
+    <p class="eyebrow">Ingeniería de Software II · Marketplace de alquiler de espacios</p>
+    <h1>Tablero IS2</h1>
+    <p class="entrega" id="entrega"></p>
+    <div class="progreso" id="progreso"></div>
+  </header>
+
+  <div class="controles" id="controles">
+    <div class="campo">
+      <label for="yo">Soy</label>
+      <select id="yo"><option value="">Elige tu nombre…</option></select>
+    </div>
+    <div class="segmentado" role="group" aria-label="Qué tareas ver">
+      <button type="button" data-ver="mias">Mis tareas</button>
+      <button type="button" data-ver="todas">Todo el equipo</button>
+    </div>
+    <label class="check"><input type="checkbox" id="ocultar-hechas"> Ocultar hechas</label>
+    <a class="ir" id="ir-semana" href="#">Ir a esta semana</a>
+  </div>
+
+  <div class="aviso" id="aviso" role="status" hidden></div>
+
+  <div class="pestanas" role="tablist" aria-label="Secciones">
+    <button type="button" role="tab" id="tab-tareas" aria-controls="panel-tareas" data-tab="tareas">Tareas</button>
+    <button type="button" role="tab" id="tab-reparto" aria-controls="panel-reparto" data-tab="reparto">Reparto y reglas</button>
+  </div>
+
+  <main>
+    <section id="panel-tareas" role="tabpanel" aria-labelledby="tab-tareas"></section>
+    <section id="panel-reparto" role="tabpanel" aria-labelledby="tab-reparto" hidden></section>
+  </main>
+
+  <footer class="pie">Para cambiar el estado de una tarea, toca su botón: Pendiente → En curso → Hecho. Las fechas son aproximadas y la semana empieza el lunes.</footer>
+</div>
+<script src="tareas.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

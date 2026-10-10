@@ -1,0 +1,6 @@
+{
+  "name": "tablero-is2",
+  "private": true,
+  "description": "Tablero de tareas del equipo para el Proyecto Final de Ingeniería de Software II",
+  "type": "module"
+}
