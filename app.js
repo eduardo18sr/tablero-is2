@@ -143,7 +143,9 @@
     renderControles();
     renderAviso();
     renderPestanas();
-    if (st.tab === "tareas") renderTareas(); else renderReparto();
+    if (st.tab === "tareas") renderTareas();
+    else if (st.tab === "historias") renderHistorias();
+    else renderReparto();
   }
 
   function barra(texto, hechas, total) {
@@ -216,6 +218,7 @@
       b.tabIndex = activa ? 0 : -1;
     }
     $("#panel-tareas").hidden = st.tab !== "tareas";
+    $("#panel-historias").hidden = st.tab !== "historias";
     $("#panel-reparto").hidden = st.tab !== "reparto";
   }
 
@@ -233,10 +236,12 @@
     const detalles = h("details", { "data-id": t.id, open: st.abiertos.has(t.id) },
       h("summary", { text: t.titulo }),
       h("p", { text: t.detalle }));
+    const pareja = t.paso === "programa" && persona[t.personas[0]] ? persona[t.personas[0]].pareja : null;
     const meta = h("div", { class: "meta" },
       h("span", { class: "tag", text: t.tipo }),
-      t.hu ? h("span", { class: "tag", text: t.hu }) : null,
+      ...(t.hu || []).map(botonHU),
       ...t.personas.map(chipPersona),
+      pareja ? h("span", { class: "marca", text: `Después la prueba ${primerNombre(pareja)}` }) : null,
       info && info.por && est !== "pendiente"
         ? h("span", { class: "marca", text: `${ETIQUETA[est]} · ${primerNombre(info.por)}, ${fechaCorta(info.ts)}` })
         : null);
@@ -273,6 +278,78 @@
       ? h("p", { class: "vacio", text: "Elige tu nombre arriba para ver solo tus tareas. Mientras tanto se muestran las de todo el equipo." })
       : null;
     panel.replaceChildren(...[avisoFiltro, ...bloques].filter(Boolean));
+  }
+
+  function botonHU(codigo) {
+    return h("button", { type: "button", class: "tag tag-hu", "data-hu": codigo, title: `Ver ${codigo} en Historias`, text: codigo });
+  }
+
+  function pasosDe(codigo) {
+    const cod = PLAN.tareas.find((t) => t.paso === "programa" && t.hu.includes(codigo));
+    const qa = PLAN.tareas.find((t) => t.paso === "prueba" && t.hu.includes(codigo));
+    const ec = estadoDe(cod.id), eq = estadoDe(qa.id);
+    let resumen = { clave: "sin-empezar", texto: "Sin empezar" };
+    if (ec === "hecho" && eq === "hecho") resumen = { clave: "lista", texto: "Lista" };
+    else if (ec === "hecho") resumen = { clave: "pruebas", texto: "En pruebas" };
+    else if (ec === "en-curso") resumen = { clave: "desarrollo", texto: "En desarrollo" };
+    return { cod, qa, ec, eq, resumen };
+  }
+
+  function pill(est) {
+    return h("span", { class: "pill", "data-estado": est }, h("span", { class: "punto", "aria-hidden": "true" }), ETIQUETA[est]);
+  }
+
+  function renderHistorias() {
+    const panel = $("#panel-historias");
+    const semana = Object.fromEntries(PLAN.semanas.map((s) => [s.id, s]));
+    const orden = PLAN.bloques.flatMap((b) => b.historias.map((c) => ({ codigo: c, semana: b.semana })));
+    const listas = orden.filter((x) => pasosDe(x.codigo).resumen.clave === "lista").length;
+
+    const filas = orden.map(({ codigo, semana: sid }) => {
+      const info = PLAN.hu[codigo];
+      const p = pasosDe(codigo);
+      const relacionadas = PLAN.tareas.filter((t) => !t.paso && (t.hu || []).includes(codigo));
+      const detalles = h("details", {},
+        h("summary", { text: "Criterios y tareas relacionadas" }),
+        h("p", { text: info.detalle }),
+        relacionadas.length
+          ? h("ul", {}, relacionadas.map((t) => h("li", {}, `${semana[t.semana].titulo}: ${t.titulo} · `, pill(estadoDe(t.id)))))
+          : null);
+      return h("tr", { id: `hu-${codigo}` },
+        h("td", {}, h("strong", { class: "hu-cod", text: codigo }), h("span", { class: "hu-tit", text: info.titulo }), detalles),
+        h("td", {}, h("span", { text: semana[sid].titulo.replace("Semana", "Sem.") }), h("span", { class: "sub", text: `Release ${info.release}` })),
+        h("td", {}, h("div", { class: "paso" }, chipPersona(p.cod.personas[0]), pill(p.ec))),
+        h("td", {}, h("div", { class: "paso" }, chipPersona(p.qa.personas[0]), pill(p.eq))),
+        h("td", {}, info.depende.length ? h("div", { class: "meta" }, info.depende.map(botonHU)) : h("span", { class: "sub", text: "Ninguna" })),
+        h("td", {}, h("span", { class: "resumen", "data-resumen": p.resumen.clave, text: p.resumen.texto })));
+    });
+
+    const parejas = PLAN.personas.filter((x) => x.id < x.pareja)
+      .map((x) => `${x.nombre.split(" ")[0]} y ${persona[x.pareja].nombre.split(" ")[0]}`).join(" · ");
+
+    panel.replaceChildren(
+      h("div", { class: "bloque" },
+        h("h2", { text: "Cómo avanza cada historia" }),
+        h("ol", {},
+          h("li", {}, h("strong", { text: "Programa: " }), "el dueño construye la historia y abre un pull request."),
+          h("li", {}, h("strong", { text: "Prueba y documenta: " }), "su pareja revisa el pull request, escribe las pruebas unitarias, recorre los criterios (incluido un caso de error) y guarda capturas como evidencia."),
+          h("li", {}, h("strong", { text: "Lista: " }), "cuando los dos pasos están en Hecho.")),
+        h("p", {}, "Las parejas son fijas y cada una prueba las historias de la otra: ", h("strong", { text: parejas }), "."),
+        h("p", { class: "sub-texto", text: "\"Depende de\" indica qué historias tienen que existir antes, según el backlog. Toca un código para ir a esa historia." })),
+      h("div", { class: "bloque" },
+        h("div", { class: "semana-cab" }, h("h2", { text: "Trazabilidad de las historias" }), h("span", { class: "cuenta", text: `${listas} de ${orden.length} listas` })),
+        h("div", { class: "tabla" }, h("table", { class: "trazabilidad" },
+          h("thead", {}, h("tr", {}, ["Historia", "Cuándo", "Programa", "Prueba y documenta", "Depende de", "Estado"].map((x) => h("th", { text: x })))),
+          h("tbody", {}, filas)))));
+  }
+
+  function irAHistoria(codigo) {
+    st.tab = "historias"; guardar(CLAVES.tab, st.tab); render();
+    const fila = document.getElementById(`hu-${codigo}`);
+    if (!fila) return;
+    fila.scrollIntoView({ block: "center" });
+    fila.classList.add("resaltada");
+    setTimeout(() => fila.classList.remove("resaltada"), 1600);
   }
 
   function renderReparto() {
@@ -355,6 +432,12 @@
     const boton = e.target.closest("button.estado");
     if (boton) cambiar(boton.dataset.id);
   });
+  for (const panel of [panelTareas, $("#panel-historias")]) {
+    panel.addEventListener("click", (e) => {
+      const tag = e.target.closest("button.tag-hu");
+      if (tag) irAHistoria(tag.dataset.hu);
+    });
+  }
   panelTareas.addEventListener("toggle", (e) => {
     const d = e.target;
     if (d.tagName !== "DETAILS") return;
