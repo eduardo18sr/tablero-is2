@@ -10,11 +10,11 @@
       capitulos: "3 (métricas, Burn Up y Burn Down)", rol: "Lleva la hoja de métricas: puntos planificados y reales de cada día." },
     { id: "p3", nombre: "Eduardo Saldaña", pareja: "p6", huR1: "HU-03", huR2: "HU-12",
       capitulos: "5 (requisitos y trazabilidad) y 11", rol: "Mantiene el backlog y la matriz de trazabilidad." },
-    { id: "p4", nombre: "Ariel Enriquez", pareja: "p1", huR1: "HU-04", huR2: "HU-07",
+    { id: "p4", nombre: "Kevin Chan", pareja: "p1", huR1: "HU-04", huR2: "HU-07",
       capitulos: "6 (arquitectura y vistas)", rol: "Arma el esqueleto del backend." },
-    { id: "p5", nombre: "Kevin Chan", pareja: "p2", huR1: "HU-05", huR2: "HU-08",
+    { id: "p5", nombre: "Sebastian Garate", pareja: "p2", huR1: "HU-05", huR2: "HU-08",
       capitulos: "7 y 9 (diseño, clases, patrones, endpoints y base de datos)", rol: "Diseña el modelo y el script de la base de datos." },
-    { id: "p6", nombre: "Sebastian Garate", pareja: "p3", huR1: "HU-06", huR2: "HU-11",
+    { id: "p6", nombre: "Ariel Enriquez", pareja: "p3", huR1: "HU-06", huR2: "HU-11",
       capitulos: "10 y 12 (pruebas y repositorio)", rol: "Arma el frontend base y las pruebas automáticas, el README y el ZIP de entrega." },
   ];
 

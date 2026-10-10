@@ -52,6 +52,6 @@ npx vercel dev
 | p1 | Jorge Quispe |
 | p2 | Adriana Callupe |
 | p3 | Eduardo Saldaña |
-| p4 | Ariel Enriquez |
-| p5 | Kevin Chan |
-| p6 | Sebastian Garate |
+| p4 | Kevin Chan |
+| p5 | Sebastian Garate |
+| p6 | Ariel Enriquez |
