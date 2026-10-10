@@ -26,11 +26,13 @@
       <label for="yo">Soy</label>
       <select id="yo"><option value="">Elige tu nombre…</option></select>
     </div>
+    <div class="filtros" id="filtros-tareas">
     <div class="segmentado" role="group" aria-label="Qué tareas ver">
       <button type="button" data-ver="mias">Mis tareas</button>
       <button type="button" data-ver="todas">Todo el equipo</button>
     </div>
     <label class="check"><input type="checkbox" id="ocultar-hechas"> Ocultar hechas</label>
+    </div>
     <a class="ir" id="ir-semana" href="#">Ir a esta semana</a>
   </div>
 
@@ -39,13 +41,15 @@
   <div class="pestanas" role="tablist" aria-label="Secciones">
     <button type="button" role="tab" id="tab-tareas" aria-controls="panel-tareas" data-tab="tareas">Tareas</button>
     <button type="button" role="tab" id="tab-historias" aria-controls="panel-historias" data-tab="historias">Historias</button>
-    <button type="button" role="tab" id="tab-reparto" aria-controls="panel-reparto" data-tab="reparto">Reparto y reglas</button>
+    <button type="button" role="tab" id="tab-informe" aria-controls="panel-informe" data-tab="informe">Informe</button>
+    <button type="button" role="tab" id="tab-equipo" aria-controls="panel-equipo" data-tab="equipo">Cómo trabajamos</button>
   </div>
 
   <main>
     <section id="panel-tareas" role="tabpanel" aria-labelledby="tab-tareas"></section>
     <section id="panel-historias" role="tabpanel" aria-labelledby="tab-historias" hidden></section>
-    <section id="panel-reparto" role="tabpanel" aria-labelledby="tab-reparto" hidden></section>
+    <section id="panel-informe" role="tabpanel" aria-labelledby="tab-informe" hidden></section>
+    <section id="panel-equipo" role="tabpanel" aria-labelledby="tab-equipo" hidden></section>
   </main>
 
   <footer class="pie">Para cambiar el estado de una tarea, toca su botón: Pendiente → En curso → Hecho. Las fechas son aproximadas y la semana empieza el lunes.</footer>
