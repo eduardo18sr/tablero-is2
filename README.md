@@ -3,8 +3,11 @@
 Una página sencilla con las tareas del equipo para el Proyecto Final de Ingeniería de Software II. Cada persona elige su nombre, ve sus tareas semana por semana y marca cada una como **Pendiente → En curso → Hecho**. Todo el equipo ve los cambios.
 
 - `index.html`, `estilos.css` y `app.js`: la página. Son archivos estáticos y no necesitan build.
-- `tareas.js`: el plan (personas, semanas y tareas). **Para cambiar el plan, edita este archivo.**
+- `historias.js`: las 28 historias (descripción, criterios, STRIDE y dependencias), generadas desde el Excel del backlog. No se edita a mano.
+- `tareas.js`: el plan (personas, roles, quién programa cada historia, semanas, tareas, estructura del informe y guía de IA). **Para cambiar el plan, edita este archivo.**
+- `proyecto.md`: la especificación del proyecto para las personas y sus asistentes de IA. Se genera desde `historias.js` y `tareas.js`.
 - `api/estado.js`: la función de Vercel que guarda el estado de cada tarea en Redis.
+- `scripts/`: `importar-excel.py` (Excel → `historias.js`) y `generar-md.cjs` (→ `proyecto.md`).
 
 ## Publicarlo en Vercel
 
@@ -43,7 +46,8 @@ npx vercel dev
 
 ## Cambiar el plan
 
-- Edita `tareas.js` y vuelve a subirlo a GitHub; Vercel lo despliega solo.
+- Edita `tareas.js`, regenera la especificación con `node scripts/generar-md.cjs` y sube los cambios a GitHub; Vercel lo despliega solo.
+- Si cambia el Excel del backlog: `python scripts/importar-excel.py "ruta/al/Excel.xlsx" historias.js` y después `node scripts/generar-md.cjs`.
 - **No cambies el `id` de una tarea que ya tiene estado**: el estado se guarda por id.
 - Para agregar una tarea, copia una existente, ponle un `id` nuevo que empiece con su semana (por ejemplo `s9-mi-tarea`) y elige a quién le toca (`p1` a `p6`, o `equipo`).
 

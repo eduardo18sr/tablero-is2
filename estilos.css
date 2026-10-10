@@ -202,3 +202,27 @@ td .sub { display: block; color: var(--muted); font-size: .84rem; }
 .copiar { margin-left: auto; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: .82rem; }
 .copiar:hover { border-color: var(--accent); color: var(--accent); }
 .bloque .flujo { padding: 0; max-width: none; }
+
+/* Detalle de historias */
+.criterios { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: .85rem; color: var(--muted); }
+.ir-esp { margin-top: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: .82rem; color: var(--accent); }
+.ir-esp:hover { border-color: var(--accent); }
+
+/* Especificación */
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+a.boton { display: inline-flex; align-items: center; text-decoration: none; }
+.boton-sec { background: var(--surface); color: var(--accent); border: 1px solid var(--line); }
+.boton-sec:hover { border-color: var(--accent); }
+.md { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px 22px; display: grid; gap: 12px; min-width: 0; line-height: 1.6; }
+.md h2 { font-size: 1.5rem; }
+.md h3 { font-size: 1.2rem; padding-top: 10px; border-top: 1px solid var(--line); }
+.md h4 { font-size: 1.05rem; color: var(--accent); }
+.md h5 { font-size: 1rem; font-family: var(--display); margin: 0; padding-top: 8px; scroll-margin-top: 80px; }
+.md h5.resaltada, .md h5:target { background: var(--accent-soft); }
+.md p, .md li { max-width: 75ch; }
+.md ul, .md ol { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.md blockquote { margin: 0; padding: 10px 14px; border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 6px 6px 0; }
+.md code { font: 500 .85em var(--mono); background: var(--sunken); padding: 1px 5px; border-radius: 4px; }
+.md .tabla table { min-width: 560px; }
+.pestanas { overflow-x: auto; scrollbar-width: thin; }
+.pestanas button { white-space: nowrap; flex: none; }

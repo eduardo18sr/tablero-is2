@@ -7,7 +7,7 @@
     yo: "tablero-is2:yo", ver: "tablero-is2:ver", ocultar: "tablero-is2:ocultar",
     tab: "tablero-is2:tab", local: "tablero-is2:estados-local", codigo: "tablero-is2:codigo",
   };
-  const TABS = ["tareas", "historias", "informe", "equipo"];
+  const TABS = ["tareas", "historias", "informe", "especificacion", "equipo"];
   const SIGUIENTE = { pendiente: "en-curso", "en-curso": "hecho", hecho: "pendiente" };
   const ETIQUETA = { pendiente: "Pendiente", "en-curso": "En curso", hecho: "Hecho" };
   const MOMENTO = {
@@ -189,6 +189,7 @@
     if (st.tab === "tareas") renderTareas();
     else if (st.tab === "historias") renderHistorias();
     else if (st.tab === "informe") renderInforme();
+    else if (st.tab === "especificacion") renderEspecificacion();
     else renderEquipo();
   }
 
@@ -329,7 +330,8 @@
         prueba: "Revisión del pull request, pruebas unitarias, casos de caja negra, capturas con código de evidencia y la fila en la matriz de trazabilidad.",
       }[clave];
       return h("li", { class: "paso-flujo" },
-        h("div", { class: "paso-cab" }, h("strong", { text: p.nombre }), h("span", { class: "tag tag-cuando", text: p.cuando }), h("span", { class: "sub-texto", text: quien })),
+        h("div", { class: "paso-cab" }, h("strong", { text: p.nombre }), h("span", { class: "sub-texto", text: quien })),
+        h("p", { class: "sub-texto", text: `1.er sprint de la semana: ${p.cuando[0]} · 2.º sprint: ${p.cuando[1]}` }),
         h("p", { text: produce }),
         h("div", { class: "meta" }, h("span", { class: "sub-texto", text: "Alimenta:" }), ...p.secciones.map(botonSeccion)));
     }));
@@ -339,25 +341,32 @@
       const p = pasosDe(codigo);
       const relacionadas = PLAN.tareas.filter((t) => !t.paso && (t.hu || []).includes(codigo));
       const detalles = h("details", { "data-key": "hu:" + codigo, open: st.abiertos.has("hu:" + codigo) },
-        h("summary", { text: "Criterios y tareas relacionadas" }),
-        h("p", { text: info.detalle }),
-        relacionadas.length ? listaTareas(relacionadas) : null);
+        h("summary", { text: "Criterios, STRIDE y tareas relacionadas" }),
+        h("p", { text: info.descripcion }),
+        h("p", { class: "sub-texto", text: "Criterios de aceptación" }),
+        h("ul", { class: "criterios" }, info.criterios.map((c) => h("li", { text: c }))),
+        h("p", { class: "sub-texto", text: "Seguridad (STRIDE)" }),
+        h("ul", { class: "criterios" }, info.stride.map((c) => h("li", { text: c }))),
+        relacionadas.length ? h("p", { class: "sub-texto", text: "Tareas relacionadas" }) : null,
+        relacionadas.length ? listaTareas(relacionadas) : null,
+        h("button", { type: "button", class: "ir-esp", "data-esp": codigo, text: "Ver en la especificación" }));
       return h("tr", { id: `hu-${codigo}` },
         h("td", {}, h("strong", { class: "hu-cod", text: codigo }), h("span", { class: "hu-tit", text: info.titulo }), detalles),
-        h("td", {}, h("span", { text: semanaDe[sid].titulo.replace("Semana", "Sem.") }), h("span", { class: "sub", text: `Release ${info.release}` })),
+        h("td", {}, h("span", { text: semanaDe[sid].titulo.replace("Semana", "Sem.") }), h("span", { class: "sub", text: `R${info.release} · Sprint ${info.sprint} · ${info.tamano}` })),
         h("td", {}, h("div", { class: "paso" }, chipPersona(p.cod.personas[0])),
           h("div", { class: "paso" }, h("span", { class: "sub-texto", text: "Diseño" }), pill(p.e.dis)),
           h("div", { class: "paso" }, h("span", { class: "sub-texto", text: "Código" }), pill(p.e.cod))),
         h("td", {}, h("div", { class: "paso" }, chipPersona(p.qa.personas[0])),
           h("div", { class: "paso" }, h("span", { class: "sub-texto", text: "Pruebas" }), pill(p.e.qa))),
-        h("td", {}, info.depende.length ? h("div", { class: "meta" }, info.depende.map(botonHU)) : h("span", { class: "sub", text: "Ninguna" })),
+        h("td", {}, info.depende.length ? h("div", { class: "meta" }, info.depende.map(botonHU)) : h("span", { class: "sub", text: "Ninguna" }),
+          info.dependeTexto.includes("(") ? h("span", { class: "sub", text: info.dependeTexto.slice(info.dependeTexto.indexOf("(")) }) : null),
         h("td", {}, h("span", { class: "resumen", "data-resumen": p.resumen.clave, text: p.resumen.texto })));
     });
 
     $("#panel-historias").replaceChildren(
       h("div", { class: "bloque" },
         h("h2", { text: "Cómo avanza cada historia" }),
-        h("p", {}, "Cada historia pasa por tres pasos en su semana, y cada paso alimenta secciones del informe. Las parejas son fijas y cada una prueba las historias de la otra: ", h("strong", { text: parejas }), "."),
+        h("p", {}, "Cada semana de trabajo cubre dos sprints del backlog; las historias del primer sprint van primero. Cada historia pasa por tres pasos, y cada paso alimenta secciones del informe. Las parejas son fijas y cada una prueba las historias de la otra: ", h("strong", { text: parejas }), "."),
         flujo),
       h("div", { class: "bloque" },
         h("div", { class: "semana-cab" }, h("h2", { text: "Trazabilidad de las historias" }), h("span", { class: "cuenta", text: `${listas} de ${orden.length} listas` })),
@@ -413,8 +422,8 @@
       const suyas = PLAN.tareas.filter((t) => t.personas.includes(p.id) || t.personas.includes("equipo"));
       return h("tr", {},
         h("td", {}, h("strong", { text: p.nombre })),
-        h("td", {}, botonHU(p.huR1), h("span", { class: "sub", text: PLAN.hu[p.huR1].titulo })),
-        h("td", {}, botonHU(p.huR2), h("span", { class: "sub", text: PLAN.hu[p.huR2].titulo })),
+        h("td", { text: p.rolScrum }),
+        h("td", {}, h("div", { class: "meta" }, p.historias.map(botonHU))),
         h("td", { text: persona[p.pareja].nombre }),
         h("td", { text: p.capitulos }),
         h("td", { text: p.rol }),
@@ -433,9 +442,9 @@
     $("#panel-equipo").replaceChildren(
       h("div", { class: "bloque" },
         h("h2", { text: "Quién hace qué" }),
-        h("p", { text: "Cada persona diseña y programa una historia del Release 1 y otra del Release 2. Las parejas son fijas: la semana en que no programas, pruebas y documentas la historia de tu pareja." }),
+        h("p", { text: "Ariel es Product Owner y Kevin Scrum Master; Jorge, Eduardo, Adriana y Sebastian son Dev1 a Dev4. Todos diseñan y programan historias (4 o 5 cada uno) y prueban y documentan las de su pareja." }),
         h("div", { class: "tabla" }, h("table", {},
-          h("thead", {}, h("tr", {}, ["Persona", "Programa en R1", "Programa en R2", "Pareja", "Capítulos del informe", "Rol", "Avance"].map((x) => h("th", { text: x })))),
+          h("thead", {}, h("tr", {}, ["Persona", "Rol Scrum", "Diseña y programa", "Pareja (prueba sus historias)", "Capítulos del informe", "Responsabilidad", "Avance"].map((x) => h("th", { text: x })))),
           h("tbody", {}, filas)))),
       h("div", { class: "bloque" },
         h("h2", { text: "Cómo usamos la IA en el código y en el informe" }),
@@ -446,11 +455,11 @@
       h("div", { class: "bloque" },
         h("h2", { text: "Rutina de cada semana de trabajo" }),
         lista("ol", [
-          "Lunes: planning (las historias de la semana se dividen en tareas Doc, Cod y QA y se estiman en puntos) y, el mismo día, el diseño de cada historia.",
-          "De martes a jueves se programa; el jueves cada dueño abre su pull request.",
-          "De jueves a viernes, cada pareja prueba y documenta.",
+          "Lunes: planning con Kevin (cada historia se divide en tareas Doc, Cod y QA y se estima en puntos), acuerdo de contratos entre los dueños y diseño de las historias del primer sprint de la semana.",
+          "Historias del primer sprint: se programan de lunes a miércoles y se prueban de miércoles a jueves.",
+          "Historias del segundo sprint: se diseñan el miércoles, se programan de miércoles a viernes y se prueban de viernes a domingo.",
           "Todos los días, daily en el grupo (qué hice, qué haré y qué me bloquea) y Adriana actualiza la hoja de métricas.",
-          "Viernes: review, retro y acta. El domingo, merge a main.",
+          "Viernes: review con Ariel, que acepta o devuelve cada historia; retro y actas con Kevin. El domingo, merge a main.",
         ])),
       h("div", { class: "bloque" },
         h("h2", { text: "Reglas del equipo" }),
@@ -466,12 +475,112 @@
       h("div", { class: "bloque" },
         h("h2", { text: "Por definir" }),
         lista("ul", [
-          "Cómo se presentan los sprints en el informe, con 2 historias por sprint.",
-          "Qué sprint del Release 1 y cuál del Release 2 se documentan y se graban en video.",
+          "La base de datos: es una decisión de arquitectura (Spring Boot y Angular ya están decididos).",
+          "Qué sprint del Release 1 y cuál del Release 2 se graban en video.",
           "Qué historia documenta a fondo cada persona en el capítulo 8.",
-          "Quién es el Product Owner (la tabla de roles 2.3 lo pide).",
+          "Las fechas reales de cada sprint para el informe: cada semana tiene dos sprints del backlog.",
           "Duración y formato de los videos (preguntarle al profesor).",
         ])));
+  }
+
+  // ── Pestaña Especificación
+  const especificacion = { texto: null, html: null, error: false };
+  async function cargarEspecificacion() {
+    if (especificacion.texto) return;
+    try {
+      const r = await fetch("proyecto.md", { cache: "no-store" });
+      if (!r.ok) throw new Error(String(r.status));
+      especificacion.texto = await r.text();
+      especificacion.html = markdown(especificacion.texto);
+      especificacion.error = false;
+    } catch { especificacion.error = true; }
+  }
+
+  // Renderizador de Markdown mínimo: el .md es nuestro y usa una sintaxis acotada
+  // (títulos, citas, tablas, listas con un nivel de anidación, párrafos, `código`, **negrita** y *cursiva*).
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const enLinea = (t) => esc(t)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  function markdown(texto) {
+    const L = texto.replace(/\r/g, "").split("\n");
+    const out = [];
+    const esLista = (l) => /^(\s*)([-*]|\d+\.) /.test(l);
+    let i = 0;
+    while (i < L.length) {
+      const l = L[i];
+      if (!l.trim()) { i++; continue; }
+      const m = l.match(/^(#{1,4}) (.*)$/);
+      if (m) {
+        const n = m[1].length + 1;
+        const cod = m[2].match(/^(HU-\d\d)/);
+        out.push(`<h${n}${cod ? ` id="esp-${cod[1]}"` : ""}>${enLinea(m[2])}</h${n}>`);
+        i++; continue;
+      }
+      if (l.startsWith(">")) {
+        const b = [];
+        while (i < L.length && L[i].startsWith(">")) b.push(enLinea(L[i++].replace(/^> ?/, "")));
+        out.push(`<blockquote>${b.join("<br>")}</blockquote>`);
+        continue;
+      }
+      if (l.startsWith("|")) {
+        const f = [];
+        while (i < L.length && L[i].startsWith("|")) f.push(L[i++]);
+        const celdas = (r) => r.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+        const cab = celdas(f[0]).map((c) => `<th>${enLinea(c)}</th>`).join("");
+        const cuerpo = f.slice(2).map((r) => `<tr>${celdas(r).map((c) => `<td>${enLinea(c)}</td>`).join("")}</tr>`).join("");
+        out.push(`<div class="tabla"><table><thead><tr>${cab}</tr></thead><tbody>${cuerpo}</tbody></table></div>`);
+        continue;
+      }
+      if (esLista(l)) {
+        const items = [];
+        while (i < L.length && esLista(L[i])) {
+          const mm = L[i++].match(/^(\s*)([-*]|\d+\.) (.*)$/);
+          items.push({ hijo: mm[1].length >= 2, ord: /\d/.test(mm[2]), texto: mm[3] });
+        }
+        const tag = items[0].ord ? "ol" : "ul";
+        let html = `<${tag}>`;
+        for (let k = 0; k < items.length;) {
+          const it = items[k++];
+          const hijos = [];
+          while (k < items.length && items[k].hijo) hijos.push(items[k++]);
+          const t2 = hijos.length && hijos[0].ord ? "ol" : "ul";
+          const sub = hijos.length ? `<${t2}>${hijos.map((x) => `<li>${enLinea(x.texto)}</li>`).join("")}</${t2}>` : "";
+          html += `<li>${enLinea(it.texto)}${sub}</li>`;
+        }
+        out.push(html + `</${tag}>`);
+        continue;
+      }
+      const p = [];
+      while (i < L.length && L[i].trim() && !/^(#|>|\|)/.test(L[i]) && !esLista(L[i])) p.push(L[i++]);
+      out.push(`<p>${enLinea(p.join(" "))}</p>`);
+    }
+    return out.join("\n");
+  }
+
+  function renderEspecificacion() {
+    const panel = $("#panel-especificacion");
+    const url = new URL("proyecto.md", location.href).href;
+    const cabecera = h("div", { class: "bloque" },
+      h("h2", { text: "Especificación del proyecto (proyecto.md)" }),
+      h("p", { text: "Todo lo que una persona o su IA necesita para trabajar en el proyecto: producto, equipo, stack, reglas de arquitectura y de seguridad, estados, alcance, plan y las 28 historias con sus criterios y STRIDE. Se genera con los mismos datos de este tablero." }),
+      h("ol", {},
+        h("li", {}, h("strong", { text: "Con tu IA: " }), "descarga el archivo y adjúntalo al chat, o cópialo y pégalo al empezar. Si tu herramienta puede leer enlaces, dale esta dirección: ", h("code", { text: url })),
+        h("li", {}, h("strong", { text: "En el repositorio del proyecto: " }), "va en la raíz como AGENTS.md, y así Claude Code, Kiro, Copilot y otros lo leen solos. Cuando el equipo decida algo (por ejemplo, la base de datos), se actualiza ahí y queda versionado.")),
+      h("div", { class: "acciones" },
+        h("button", { type: "button", class: "boton copiar-esp", text: "Copiar todo" }),
+        h("a", { class: "boton boton-sec", href: "proyecto.md", download: "proyecto.md", text: "Descargar proyecto.md" }),
+        h("a", { class: "boton boton-sec", href: "proyecto.md", target: "_blank", rel: "noopener", text: "Abrir en texto plano" })));
+    if (!especificacion.texto && !especificacion.error) {
+      panel.replaceChildren(cabecera, h("p", { class: "vacio", text: "Cargando la especificación…" }));
+      cargarEspecificacion().then(() => { if (st.tab === "especificacion") renderEspecificacion(); });
+      return;
+    }
+    const cuerpo = h("article", { class: "md" });
+    if (especificacion.error) cuerpo.append(h("p", { class: "vacio", text: "No se pudo cargar proyecto.md. Recarga la página." }));
+    else cuerpo.innerHTML = especificacion.html;   // HTML generado desde nuestro propio .md, con el texto escapado
+    panel.replaceChildren(cabecera, cuerpo);
   }
 
   // ── Navegación entre pestañas
@@ -510,6 +619,15 @@
     if (tagHU) { irA("historias", `hu-${tagHU.dataset.hu}`); return; }
     const tagSec = e.target.closest("button.tag-sec");
     if (tagSec) { irA("informe", idSeccion(tagSec.dataset.sec)); return; }
+    const irEsp = e.target.closest("button.ir-esp");
+    if (irEsp) { await cargarEspecificacion(); irA("especificacion", "esp-" + irEsp.dataset.esp); return; }
+    const copiarEsp = e.target.closest("button.copiar-esp");
+    if (copiarEsp) {
+      try { await navigator.clipboard.writeText(especificacion.texto || ""); copiarEsp.textContent = "Copiado"; }
+      catch { copiarEsp.textContent = "No se pudo copiar: usa Descargar"; }
+      setTimeout(() => { copiarEsp.textContent = "Copiar todo"; }, 2000);
+      return;
+    }
     const copiar = e.target.closest("button.copiar");
     if (copiar) {
       const pre = document.getElementById(`prompt-${copiar.dataset.prompt}`);
