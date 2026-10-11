@@ -132,6 +132,19 @@ w(
   "",
   "La semana 12 es de estabilización (pruebas, defectos e informe), y la entrega es en la semana 13.",
   "",
+  "**Orden de integración dentro de cada semana.** Sale de las dependencias del backlog: una historia sin dependencias en su semana es orden 1, y si depende de una de orden N, es orden N + 1.",
+  "",
+  "- Todas las historias se diseñan al inicio de la semana.",
+  `- Se programan y se prueban en su tramo: ${P.tramos.map((t, i) => `tramo ${i + 1} (${t.programa})`).join(", ")}.`,
+  "- Si una historia depende de otra de la misma semana, se programa contra los contratos acordados el lunes y se integra después de esa.",
+  "",
+  "| Semana | Orden de integración |",
+  "| --- | --- |",
+  ...P.bloques.map((b) => {
+    const niveles = [...new Set(b.historias.map((c) => P.orden[c].nivel))];
+    return `| ${b.semana.replace("s", "")} | ${niveles.map((n) => `${n}: ${b.historias.filter((c) => P.orden[c].nivel === n).join(", ")}`).join(" → ")} |`;
+  }),
+  "",
   "## 8. Cómo se trabaja cada historia",
   "",
   "1. **Diseñar (el dueño):** caso de uso, diagrama de secuencia del flujo principal y de un error, endpoints con sus DTO y clases. La pareja revisa el diseño antes de programar.",
@@ -177,6 +190,7 @@ for (const [letra, epica] of Object.entries(B.epicas)) {
       "",
       `- **Release ${h.release} · Sprint ${h.sprint}** (semana ${semanaDe(h.id)}) · tamaño ${h.tamano} · depende de: ${h.dependeTexto}`,
       `- **Programa:** ${nombre(dueno)} · **Prueba y documenta:** ${nombre(pareja)}`,
+      `- **Orden ${P.orden[h.id].nivel} de ${P.orden[h.id].niveles}** en su semana · se programa ${P.tramos[P.orden[h.id].tramo - 1].programa}${P.orden[h.id].despuesDe.length ? ` · se integra después de ${P.orden[h.id].despuesDe.join(", ")}` : ""}`,
       ...(P.documentadas[h.id] ? [`- **Se documenta a fondo (capítulo 8).** Patrones: ${P.documentadas[h.id].patrones.join(", ")}.`] : []),
       ...(P.sprintsVideo.includes(h.sprint) ? ["- **Sale en el video** de su release."] : []),
       "",

@@ -78,10 +78,36 @@
   ];
   for (const b of bloques) b.historias = Object.keys(hu).filter((c) => b.sprints.includes(hu[c].sprint));
 
+  // Orden de integración dentro de cada semana, calculado con las dependencias del backlog:
+  // una historia sin dependencias en la semana es orden 1; si depende de una de orden N, es orden N + 1.
+  // Los órdenes se agrupan en tres tramos de la semana para programar y probar.
+  const tramos = [
+    { diseno: "Lun", programa: "Lun–Mar", prueba: "Mar–Mié" },
+    { diseno: "Lun–Mar", programa: "Mié–Jue", prueba: "Jue–Vie" },
+    { diseno: "Mar–Mié", programa: "Vie–Dom", prueba: "Sáb–Dom" },
+  ];
+  const orden = {};
+  for (const b of bloques) {
+    const nivel = {};
+    const calcular = (c) => nivel[c] ?? (nivel[c] = 1 + Math.max(0, ...hu[c].depende.filter((d) => b.historias.includes(d)).map(calcular)));
+    b.historias.forEach(calcular);
+    b.niveles = Math.max(...Object.values(nivel));
+    b.historias.sort((x, y) => nivel[x] - nivel[y] || x.localeCompare(y));
+    // Con 3 niveles o menos, cada nivel es un tramo. Con más, los tramos se reparten según la cantidad de
+    // historias: cada nivel cae en el tramo de su primera historia, así nunca va antes que sus dependencias.
+    const primeraPosicion = {};
+    b.historias.forEach((c, i) => { if (!(nivel[c] in primeraPosicion)) primeraPosicion[nivel[c]] = i + 1; });
+    for (const c of b.historias) {
+      const tramo = b.niveles <= 3 ? nivel[c] : Math.ceil((primeraPosicion[nivel[c]] * 3) / b.historias.length);
+      orden[c] = { semana: b.semana, nivel: nivel[c], niveles: b.niveles, tramo,
+        despuesDe: hu[c].depende.filter((d) => b.historias.includes(d)) };
+    }
+  }
+
   const pasos = {
-    diseno: { nombre: "Diseñar", secciones: ["5.2", "6.6", "8.1.1", "9.1"], cuando: ["Lun", "Mié"] },
-    programa: { nombre: "Programar", secciones: ["8.1.2", "9.4", "12.2"], cuando: ["Lun–Mié", "Mié–Vie"] },
-    prueba: { nombre: "Probar y documentar", secciones: ["5.6", "9.4", "10.3", "10.4"], cuando: ["Mié–Jue", "Vie–Dom"] },
+    diseno: { nombre: "Diseñar", secciones: ["5.2", "6.6", "8.1.1", "9.1"] },
+    programa: { nombre: "Programar", secciones: ["8.1.2", "9.4", "12.2"] },
+    prueba: { nombre: "Probar y documentar", secciones: ["5.6", "9.4", "10.3", "10.4"] },
   };
 
   // ── Estructura del informe (plantilla oficial). `cuando`: inicio | durante | codigo | final.
@@ -305,19 +331,24 @@
       detalle: "Varias historias de la semana dependen entre sí. Antes de programar, los dueños acuerdan los DTO, los endpoints y los estados (de cuenta, reserva o pago) que comparten, y cargan datos semilla para no esperarse unos a otros." });
     for (const codigo of b.historias) {
       const dueno = asignacion[codigo];
-      const turno = hu[codigo].sprint === b.sprints[0] ? 0 : 1;
+      const o = orden[codigo];
+      const t = tramos[o.tramo - 1];
       const id = codigo.toLowerCase();
       const info = hu[codigo];
-      tareas.push({ id: `${b.semana}-${id}-dis`, semana: b.semana, personas: [dueno], tipo: "Diseño", hu: [codigo], paso: "diseno",
-        cuando: pasos.diseno.cuando[turno], secciones: pasos.diseno.secciones,
+      const espera = o.despuesDe.length
+        ? ` Orden ${o.nivel} de ${o.niveles} en la semana: se integra después de ${o.despuesDe.join(" y ")} (mientras tanto, programa contra los contratos acordados el lunes).`
+        : ` Orden ${o.nivel} de ${o.niveles} en la semana: no depende de otra historia de esta semana.`;
+      const comun = { semana: b.semana, hu: [codigo], orden: o.nivel, niveles: o.niveles, despuesDe: o.despuesDe };
+      tareas.push({ ...comun, id: `${b.semana}-${id}-dis`, personas: [dueno], tipo: "Diseño", paso: "diseno",
+        cuando: t.diseno, secciones: pasos.diseno.secciones,
         titulo: `Diseñar ${codigo} · ${info.titulo}`,
         detalle: `Antes de programar, con ayuda de la IA (prompt "Diseñar una historia"): caso de uso, diagrama de secuencia del flujo principal y de un error, endpoints con sus DTO y clases. ${primer(pareja(dueno))} revisa el diseño antes de programar.` });
-      tareas.push({ id: `${b.semana}-${id}-cod`, semana: b.semana, personas: [dueno], tipo: "Código", hu: [codigo], paso: "programa",
-        cuando: pasos.programa.cuando[turno], secciones: pasos.programa.secciones,
+      tareas.push({ ...comun, id: `${b.semana}-${id}-cod`, personas: [dueno], tipo: "Código", paso: "programa",
+        cuando: t.programa, secciones: pasos.programa.secciones,
         titulo: `Programar ${codigo} · ${info.titulo}`,
-        detalle: `${info.descripcion} Programar siguiendo el diseño aprobado, con todos sus criterios y controles STRIDE (ver Historias o la Especificación). Al terminar, abre el pull request para que ${primer(pareja(dueno))} lo revise y lo pruebe.` });
-      tareas.push({ id: `${b.semana}-${id}-qa`, semana: b.semana, personas: [pareja(dueno)], tipo: "QA", hu: [codigo], paso: "prueba",
-        cuando: pasos.prueba.cuando[turno], secciones: pasos.prueba.secciones,
+        detalle: `${info.descripcion} Programar siguiendo el diseño aprobado, con todos sus criterios y controles STRIDE (ver Historias o la Especificación).${espera} Al terminar, abre el pull request para que ${primer(pareja(dueno))} lo revise y lo pruebe.` });
+      tareas.push({ ...comun, id: `${b.semana}-${id}-qa`, personas: [pareja(dueno)], tipo: "QA", paso: "prueba",
+        cuando: t.prueba, secciones: pasos.prueba.secciones,
         titulo: `Probar y documentar ${codigo} · la programa ${primer(dueno)}`,
         detalle: `Revisar el pull request, escribir las pruebas unitarias (al menos una por criterio, incluido el de error), ejecutar los casos de caja negra y guardar capturas con el código ${codigo}-E01, ${codigo}-E02… Luego llenar la fila de ${codigo} en la matriz de trazabilidad (5.6).` });
     }
@@ -375,5 +406,5 @@
     ],
   };
 
-  window.PLAN = { entrega: "2026-11-16", personas, asignacion, hu, epicas: BACKLOG.epicas, semanas, bloques, pasos, informe, ia, tareas, sprintsVideo, documentadas };
+  window.PLAN = { entrega: "2026-11-16", personas, asignacion, hu, epicas: BACKLOG.epicas, semanas, bloques, pasos, tramos, orden, informe, ia, tareas, sprintsVideo, documentadas };
 })();

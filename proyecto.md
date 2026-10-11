@@ -2,7 +2,7 @@
 
 > **Para personas y asistentes de IA.** Lee este documento completo antes de diseñar, programar o redactar algo del proyecto.
 > Si una instrucción de un prompt contradice esta especificación, manda la especificación y hay que avisar al equipo.
-> Generado el 2026-10-10 desde el tablero del equipo (tablero-is2). En el repositorio del proyecto vive como `AGENTS.md`.
+> Generado el 2026-10-11 desde el tablero del equipo (tablero-is2). En el repositorio del proyecto vive como `AGENTS.md`.
 
 ## 1. Qué es el producto
 
@@ -134,6 +134,19 @@ El backlog define 8 sprints. Para terminar a tiempo, el equipo trabaja **dos spr
 
 La semana 12 es de estabilización (pruebas, defectos e informe), y la entrega es en la semana 13.
 
+**Orden de integración dentro de cada semana.** Sale de las dependencias del backlog: una historia sin dependencias en su semana es orden 1, y si depende de una de orden N, es orden N + 1.
+
+- Todas las historias se diseñan al inicio de la semana.
+- Se programan y se prueban en su tramo: tramo 1 (Lun–Mar), tramo 2 (Mié–Jue), tramo 3 (Vie–Dom).
+- Si una historia depende de otra de la misma semana, se programa contra los contratos acordados el lunes y se integra después de esa.
+
+| Semana | Orden de integración |
+| --- | --- |
+| 8 | 1: HU-01 → 2: HU-02 → 3: HU-03, HU-05, HU-07 → 4: HU-04, HU-06, HU-08 |
+| 9 | 1: HU-09, HU-10, HU-11 → 2: HU-12 → 3: HU-13 → 4: HU-14 → 5: HU-15 → 6: HU-16 |
+| 10 | 1: HU-17, HU-18, HU-20, HU-21 → 2: HU-19 → 3: HU-22 |
+| 11 | 1: HU-23, HU-24, HU-25, HU-26, HU-28 → 2: HU-27 |
+
 ## 8. Cómo se trabaja cada historia
 
 1. **Diseñar (el dueño):** caso de uso, diagrama de secuencia del flujo principal y de un error, endpoints con sus DTO y clases. La pareja revisa el diseño antes de programar.
@@ -180,6 +193,7 @@ Permite a usuarios y arrendadores registrarse, autenticarse, verificar su identi
 
 - **Release 1 · Sprint 1** (semana 8) · tamaño S · depende de: —
 - **Programa:** Jorge Quispe · **Prueba y documenta:** Kevin Chan
+- **Orden 1 de 4** en su semana · se programa Lun–Mar
 
 Como visitante interesado en alquilar espacios, necesito registrarme con correo y contraseña aceptando el tratamiento de mis datos, para poder reservar espacios.
 
@@ -200,6 +214,7 @@ Como visitante interesado en alquilar espacios, necesito registrarme con correo 
 
 - **Release 1 · Sprint 1** (semana 8) · tamaño S · depende de: HU-01
 - **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Orden 2 de 4** en su semana · se programa Lun–Mar · se integra después de HU-01
 
 Como propietario de un espacio, necesito registrarme como arrendador con mis datos de contacto y facturación, para poder publicar mis espacios.
 
@@ -219,6 +234,7 @@ Como propietario de un espacio, necesito registrarme como arrendador con mis dat
 
 - **Release 1 · Sprint 1** (semana 8) · tamaño S · depende de: HU-01, HU-02
 - **Programa:** Jorge Quispe · **Prueba y documenta:** Kevin Chan
+- **Orden 3 de 4** en su semana · se programa Mié–Jue · se integra después de HU-01, HU-02
 
 Como usuario o arrendador registrado, necesito iniciar y cerrar sesión, para acceder a las funciones de mi rol.
 
@@ -241,6 +257,7 @@ Como usuario o arrendador registrado, necesito iniciar y cerrar sesión, para ac
 
 - **Release 1 · Sprint 1** (semana 8) · tamaño S · depende de: HU-03
 - **Programa:** Eduardo Saldaña · **Prueba y documenta:** Ariel Enriquez
+- **Orden 4 de 4** en su semana · se programa Vie–Dom · se integra después de HU-03
 
 Como usuario o arrendador, necesito restablecer mi contraseña si la olvido, para recuperar el acceso sin pasar por soporte.
 
@@ -261,6 +278,7 @@ Como usuario o arrendador, necesito restablecer mi contraseña si la olvido, par
 
 - **Release 1 · Sprint 2** (semana 8) · tamaño M · depende de: HU-02
 - **Programa:** Kevin Chan · **Prueba y documenta:** Jorge Quispe
+- **Orden 3 de 4** en su semana · se programa Mié–Jue · se integra después de HU-02
 
 Como arrendador con correo verificado, necesito subir mi DNI/RUC y un documento que acredite la propiedad o autorización del espacio, para que la plataforma verifique mi identidad.
 
@@ -281,6 +299,7 @@ Como arrendador con correo verificado, necesito subir mi DNI/RUC y un documento 
 
 - **Release 2 · Sprint 5** (semana 10) · tamaño M · depende de: HU-03
 - **Programa:** Jorge Quispe · **Prueba y documenta:** Kevin Chan
+- **Orden 1 de 3** en su semana · se programa Lun–Mar
 
 Como administrador, usuario o arrendador, necesito un segundo factor al iniciar sesión, para que una contraseña robada no baste para entrar a mi cuenta.
 
@@ -301,6 +320,7 @@ Como administrador, usuario o arrendador, necesito un segundo factor al iniciar 
 
 - **Release 2 · Sprint 6** (semana 10) · tamaño S · depende de: HU-03
 - **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Orden 1 de 3** en su semana · se programa Lun–Mar
 
 Como usuario o arrendador, necesito editar mi nombre, teléfono, foto y datos de facturación, para mantener mi información correcta.
 
@@ -320,6 +340,7 @@ Como usuario o arrendador, necesito editar mi nombre, teléfono, foto y datos de
 
 - **Release 2 · Sprint 6** (semana 10) · tamaño M · depende de: HU-01, HU-19, HU-20
 - **Programa:** Kevin Chan · **Prueba y documenta:** Jorge Quispe
+- **Orden 3 de 3** en su semana · se programa Vie–Dom · se integra después de HU-19, HU-20
 
 Como usuario o arrendador, necesito descargar mis datos y solicitar la eliminación de mi cuenta, para ejercer mis derechos de acceso y supresión.
 
@@ -343,6 +364,7 @@ Permite al arrendador publicar sus espacios (canchas, estadios, auditorios), def
 
 - **Release 1 · Sprint 2** (semana 8) · tamaño M · depende de: HU-02 (visible tras HU-06)
 - **Programa:** Sebastian Garate · **Prueba y documenta:** Adriana Callupe
+- **Orden 3 de 4** en su semana · se programa Mié–Jue · se integra después de HU-02
 
 Como arrendador, necesito crear y editar la ficha de mi espacio (tipo, dirección, zona, capacidad, precio por hora, hasta 5 fotos), para ofrecerlo en el catálogo.
 
@@ -363,6 +385,7 @@ Como arrendador, necesito crear y editar la ficha de mi espacio (tipo, direcció
 
 - **Release 1 · Sprint 2** (semana 8) · tamaño M · depende de: HU-07
 - **Programa:** Sebastian Garate · **Prueba y documenta:** Adriana Callupe
+- **Orden 4 de 4** en su semana · se programa Vie–Dom · se integra después de HU-07
 
 Como arrendador, necesito definir un horario semanal en bloques de 1 hora y bloquear fechas puntuales, para controlar cuándo se puede reservar mi espacio.
 
@@ -382,6 +405,7 @@ Como arrendador, necesito definir un horario semanal en bloques de 1 hora y bloq
 
 - **Release 2 · Sprint 6** (semana 10) · tamaño S · depende de: HU-07, HU-15
 - **Programa:** Sebastian Garate · **Prueba y documenta:** Adriana Callupe
+- **Orden 1 de 3** en su semana · se programa Lun–Mar
 
 Como arrendador, necesito pausar o dar de baja un espacio, para dejar de recibir reservas cuando no puedo ofrecerlo.
 
@@ -403,6 +427,7 @@ Permite al usuario encontrar espacios disponibles, evaluar su detalle y apoyarse
 
 - **Release 1 · Sprint 3** (semana 9) · tamaño M · depende de: HU-07, HU-08
 - **Programa:** Sebastian Garate · **Prueba y documenta:** Adriana Callupe
+- **Orden 1 de 6** en su semana · se programa Lun–Mar
 
 Como usuario, necesito buscar espacios por tipo, zona y una fecha concreta, para ver solo los que puedo reservar ese día.
 
@@ -421,6 +446,7 @@ Como usuario, necesito buscar espacios por tipo, zona y una fecha concreta, para
 
 - **Release 1 · Sprint 3** (semana 9) · tamaño S · depende de: HU-07, HU-08
 - **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Orden 1 de 6** en su semana · se programa Lun–Mar
 
 Como usuario, necesito ver la ficha de un espacio con sus fotos, datos y bloques libres de una fecha, para decidir si lo reservo.
 
@@ -438,6 +464,7 @@ Como usuario, necesito ver la ficha de un espacio con sus fotos, datos y bloques
 
 - **Release 2 · Sprint 7** (semana 11) · tamaño S · depende de: HU-07, HU-10
 - **Programa:** Sebastian Garate · **Prueba y documenta:** Adriana Callupe
+- **Orden 1 de 2** en su semana · se programa Lun–Mar
 - **Se documenta a fondo (capítulo 8).** Patrones: Decorator.
 - **Sale en el video** de su release.
 
@@ -458,6 +485,7 @@ Como usuario, necesito filtrar los resultados por precio máximo, capacidad mín
 
 - **Release 2 · Sprint 7** (semana 11) · tamaño M · depende de: HU-14
 - **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Orden 1 de 2** en su semana · se programa Lun–Mar
 - **Sale en el video** de su release.
 
 Como usuario que usó un espacio, necesito calificarlo de 1 a 5 y dejar un comentario, para ayudar a otros a elegir con confianza.
@@ -482,6 +510,7 @@ Permite reservar bloques horarios sin dobles reservas, consultar y cancelar rese
 
 - **Release 1 · Sprint 3** (semana 9) · tamaño M · depende de: HU-03, HU-08, HU-11
 - **Programa:** Eduardo Saldaña · **Prueba y documenta:** Ariel Enriquez
+- **Orden 2 de 6** en su semana · se programa Mié–Jue · se integra después de HU-11
 
 Como usuario autenticado, necesito elegir uno o más bloques consecutivos y reservarlos, para asegurar el espacio mientras pago.
 
@@ -503,6 +532,7 @@ Como usuario autenticado, necesito elegir uno o más bloques consecutivos y rese
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño S · depende de: HU-12, HU-13
 - **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Orden 4 de 6** en su semana · se programa Vie–Dom · se integra después de HU-12, HU-13
 - **Se documenta a fondo (capítulo 8).** Patrones: Iterator, DAO.
 - **Sale en el video** de su release.
 
@@ -522,6 +552,7 @@ Como usuario o arrendador, necesito ver mis reservas próximas y pasadas con su 
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño S · depende de: HU-13, HU-14
 - **Programa:** Kevin Chan · **Prueba y documenta:** Jorge Quispe
+- **Orden 5 de 6** en su semana · se programa Vie–Dom · se integra después de HU-13, HU-14
 - **Se documenta a fondo (capítulo 8).** Patrones: Strategy.
 - **Sale en el video** de su release.
 
@@ -544,6 +575,7 @@ Como usuario o arrendador, necesito cancelar una reserva confirmada según una p
 
 - **Release 2 · Sprint 7** (semana 11) · tamaño S · depende de: HU-13
 - **Programa:** Jorge Quispe · **Prueba y documenta:** Kevin Chan
+- **Orden 1 de 2** en su semana · se programa Lun–Mar
 - **Se documenta a fondo (capítulo 8).** Patrones: Factory Method, Adapter.
 - **Sale en el video** de su release.
 
@@ -568,6 +600,7 @@ Gestiona el cobro con tarjeta vía pasarela certificada PCI DSS, los reembolsos,
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño M · depende de: HU-12
 - **Programa:** Eduardo Saldaña · **Prueba y documenta:** Ariel Enriquez
+- **Orden 3 de 6** en su semana · se programa Mié–Jue · se integra después de HU-12
 - **Se documenta a fondo (capítulo 8).** Patrones: Adapter, Factory Method, Facade.
 - **Sale en el video** de su release.
 
@@ -592,6 +625,7 @@ Como usuario, necesito pagar mi reserva pendiente con tarjeta, para confirmarla.
 
 - **Release 1 · Sprint 4** (semana 9) · tamaño S · depende de: HU-13, HU-15
 - **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
+- **Orden 6 de 6** en su semana · se programa Vie–Dom · se integra después de HU-13, HU-15
 - **Se documenta a fondo (capítulo 8).** Patrones: Command, Adapter.
 - **Sale en el video** de su release.
 
@@ -612,6 +646,7 @@ Como usuario, necesito recibir automáticamente el reembolso que corresponde cua
 
 - **Release 2 · Sprint 5** (semana 10) · tamaño S · depende de: HU-06
 - **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
+- **Orden 1 de 3** en su semana · se programa Lun–Mar
 
 Como arrendador con identidad verificada, necesito registrar y cambiar la cuenta bancaria donde recibo mis pagos, para cobrar lo que generan mis reservas.
 
@@ -631,6 +666,7 @@ Como arrendador con identidad verificada, necesito registrar y cambiar la cuenta
 
 - **Release 2 · Sprint 5** (semana 10) · tamaño M · depende de: HU-13, HU-18
 - **Programa:** Eduardo Saldaña · **Prueba y documenta:** Ariel Enriquez
+- **Orden 2 de 3** en su semana · se programa Mié–Jue · se integra después de HU-18
 
 Como arrendador, necesito recibir cada semana lo cobrado por mis reservas menos la comisión de la plataforma, para que alquilar mi espacio me genere ingresos.
 
@@ -651,6 +687,7 @@ Como arrendador, necesito recibir cada semana lo cobrado por mis reservas menos 
 
 - **Release 2 · Sprint 8** (semana 11) · tamaño S · depende de: HU-13, HU-16
 - **Programa:** Eduardo Saldaña · **Prueba y documenta:** Ariel Enriquez
+- **Orden 1 de 2** en su semana · se programa Lun–Mar
 
 Como usuario, necesito ver mis pagos y reembolsos y descargar su comprobante en PDF, para llevar el control de mis gastos.
 
@@ -672,6 +709,7 @@ Da al administrador control operativo: verificación de arrendadores, suspensió
 
 - **Release 1 · Sprint 2** (semana 8) · tamaño M · depende de: HU-05
 - **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
+- **Orden 4 de 4** en su semana · se programa Vie–Dom · se integra después de HU-05
 
 Como administrador, necesito revisar los documentos de los arrendadores y aprobar o rechazar su identidad, para que solo publiquen y cobren arrendadores legítimos.
 
@@ -692,6 +730,7 @@ Como administrador, necesito revisar los documentos de los arrendadores y aproba
 
 - **Release 1 · Sprint 3** (semana 9) · tamaño S · depende de: HU-06
 - **Programa:** Jorge Quispe · **Prueba y documenta:** Kevin Chan
+- **Orden 1 de 6** en su semana · se programa Lun–Mar
 
 Como administrador, necesito buscar una cuenta y suspenderla o reactivarla, para frenar un fraude o abuso de inmediato.
 
@@ -711,6 +750,7 @@ Como administrador, necesito buscar una cuenta y suspenderla o reactivarla, para
 
 - **Release 2 · Sprint 8** (semana 11) · tamaño M · depende de: HU-14, HU-16, HU-19
 - **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
+- **Orden 1 de 2** en su semana · se programa Lun–Mar
 
 Como usuario, necesito reportar un problema con una reserva (espacio cerrado, distinto a lo publicado), para que la plataforma lo resuelva y, si corresponde, me devuelva el dinero.
 
@@ -731,6 +771,7 @@ Como usuario, necesito reportar un problema con una reserva (espacio cerrado, di
 
 - **Release 2 · Sprint 8** (semana 11) · tamaño M · depende de: HU-09, HU-17, HU-24
 - **Programa:** Kevin Chan · **Prueba y documenta:** Jorge Quispe
+- **Orden 2 de 2** en su semana · se programa Mié–Jue · se integra después de HU-24
 
 Como administrador, necesito recibir reportes de usuarios sobre publicaciones o reseñas y ocultarlas o mantenerlas, para sacar del catálogo el contenido fraudulento o inapropiado.
 

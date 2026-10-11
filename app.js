@@ -262,10 +262,13 @@
       h("p", { text: t.detalle }));
     const meta = h("div", { class: "meta" },
       h("span", { class: "tag", text: t.tipo }),
+      t.orden ? h("span", { class: "tag tag-orden", title: "Orden de integración dentro de la semana", text: `Orden ${t.orden} de ${t.niveles}` }) : null,
       t.cuando ? h("span", { class: "tag tag-cuando", text: t.cuando }) : null,
       ...(t.hu || []).map(botonHU),
       ...t.personas.map(chipPersona),
       pareja ? h("span", { class: "marca", text: `Revisa ${primerNombre(pareja)}` }) : null,
+      t.paso === "programa" && t.despuesDe && t.despuesDe.length ? h("span", { class: "marca", text: "Se integra después de" }) : null,
+      ...(t.paso === "programa" && t.despuesDe ? t.despuesDe.map(botonHU) : []),
       ...(t.secciones || []).map(botonSeccion),
       info && info.por && est !== "pendiente"
         ? h("span", { class: "marca", text: `${ETIQUETA[est]} · ${primerNombre(info.por)}, ${fechaCorta(info.ts)}` })
@@ -282,7 +285,15 @@
     const actual = semanaActual();
     const visibles = PLAN.tareas.filter((t) => st.ver === "todas" || !st.yo || esMia(t));
     const bloques = PLAN.semanas.map((s) => {
-      const delaSemana = visibles.filter((t) => t.semana === s.id);
+      const indice = (t) => PLAN.tareas.indexOf(t);
+      const PASO = { diseno: 0, programa: 1, prueba: 2 };
+      // Primero los contratos y la base técnica; luego las historias por orden de integración; al final lo demás.
+      const clave = (t) => t.id.endsWith("-contratos") ? [0, 0, "", 0, indice(t)]
+        : t.paso ? [2, t.orden, t.hu[0], PASO[t.paso], 0]
+        : (t.tipo === "Código" || t.tipo === "Diseño") ? [1, 0, "", 0, indice(t)] : [3, 0, "", 0, indice(t)];
+      const comparar = (a, b) => { const x = clave(a), y = clave(b); for (let k = 0; k < x.length; k++) { if (x[k] < y[k]) return -1; if (x[k] > y[k]) return 1; } return 0; };
+      const delaSemana = visibles.filter((t) => t.semana === s.id).sort(comparar);
+      const bloque = PLAN.bloques.find((b) => b.semana === s.id);
       const mostradas = st.ocultar ? delaSemana.filter((t) => !hecha(t)) : delaSemana;
       const cab = h("div", { class: "semana-cab" },
         h("h2", { text: s.titulo }),
@@ -294,8 +305,14 @@
       if (!delaSemana.length) cuerpo = h("p", { class: "vacio", text: "No tienes tareas esta semana." });
       else if (!mostradas.length) cuerpo = h("p", { class: "vacio", text: "Todo hecho en esta semana." });
       else cuerpo = h("ul", { class: "lista" }, mostradas.map(filaTarea));
+      const ordenSemana = bloque ? h("div", { class: "orden-semana" },
+        h("span", { class: "sub-texto", text: "Orden de integración:" }),
+        ...[...new Set(bloque.historias.map((c) => PLAN.orden[c].nivel))].flatMap((n, i) => [
+          i ? h("span", { class: "flecha", "aria-hidden": "true", text: "→" }) : null,
+          h("span", { class: "nivel" }, h("strong", { text: String(n) }), ...bloque.historias.filter((c) => PLAN.orden[c].nivel === n).map(botonHU)),
+        ])) : null;
       return h("section", { class: "semana" + (s.id === actual ? " actual" : ""), id: `semana-${s.id}`, "aria-label": s.titulo },
-        cab, h("p", { class: "objetivo", text: s.objetivo }), cuerpo);
+        cab, h("p", { class: "objetivo", text: s.objetivo }), ordenSemana, cuerpo);
     });
     const avisoFiltro = st.ver === "mias" && !st.yo
       ? h("p", { class: "vacio", text: "Elige tu nombre arriba para ver solo tus tareas. Mientras tanto se muestran las de todo el equipo." })
@@ -331,7 +348,7 @@
       }[clave];
       return h("li", { class: "paso-flujo" },
         h("div", { class: "paso-cab" }, h("strong", { text: p.nombre }), h("span", { class: "sub-texto", text: quien })),
-        h("p", { class: "sub-texto", text: `1.er sprint de la semana: ${p.cuando[0]} · 2.º sprint: ${p.cuando[1]}` }),
+        h("p", { class: "sub-texto", text: PLAN.tramos.map((t, i) => `Tramo ${i + 1}: ${t[clave]}`).join(" · ") }),
         h("p", { text: produce }),
         h("div", { class: "meta" }, h("span", { class: "sub-texto", text: "Alimenta:" }), ...p.secciones.map(botonSeccion)));
     }));
@@ -358,7 +375,9 @@
                 PLAN.sprintsVideo.includes(info.sprint) ? h("span", { class: "marca-video", text: "Sale en el video" }) : null)
             : null,
           detalles),
-        h("td", {}, h("span", { text: semanaDe[sid].titulo.replace("Semana", "Sem.") }), h("span", { class: "sub", text: `R${info.release} · Sprint ${info.sprint} · ${info.tamano}` })),
+        h("td", {}, h("span", { text: `${semanaDe[sid].titulo.replace("Semana", "Sem.")} · orden ${PLAN.orden[codigo].nivel}` }),
+          h("span", { class: "sub", text: `R${info.release} · Sprint ${info.sprint} · ${info.tamano}` }),
+          h("span", { class: "sub", text: `Programa ${PLAN.tramos[PLAN.orden[codigo].tramo - 1].programa}` })),
         h("td", {}, h("div", { class: "paso" }, chipPersona(p.cod.personas[0])),
           h("div", { class: "paso" }, h("span", { class: "sub-texto", text: "Diseño" }), pill(p.e.dis)),
           h("div", { class: "paso" }, h("span", { class: "sub-texto", text: "Código" }), pill(p.e.cod))),
@@ -372,7 +391,7 @@
     $("#panel-historias").replaceChildren(
       h("div", { class: "bloque" },
         h("h2", { text: "Cómo avanza cada historia" }),
-        h("p", {}, "Cada semana de trabajo cubre dos sprints del backlog; las historias del primer sprint van primero. Cada historia pasa por tres pasos, y cada paso alimenta secciones del informe. Las parejas son fijas y cada una prueba las historias de la otra: ", h("strong", { text: parejas }), "."),
+        h("p", {}, "Cada semana de trabajo cubre dos sprints del backlog. Las historias se ordenan por sus dependencias: el orden de integración decide en qué tramo de la semana (Lun–Mar, Mié–Jue o Vie–Dom) se programa y se prueba cada una, y el diseño se hace al inicio. Cada paso alimenta secciones del informe. Las parejas son fijas y cada una prueba las historias de la otra: ", h("strong", { text: parejas }), "."),
         flujo),
       h("div", { class: "bloque" },
         h("h2", { text: "Las 6 historias que se documentan a fondo" }),
@@ -387,7 +406,7 @@
         h("div", { class: "semana-cab" }, h("h2", { text: "Trazabilidad de las historias" }), h("span", { class: "cuenta", text: `${listas} de ${orden.length} listas` })),
         h("p", { class: "sub-texto", text: "\"Depende de\" indica qué historias tienen que existir antes, según el backlog. Toca un código para ir a esa historia, o una sección (§) para verla en el informe." }),
         h("div", { class: "tabla" }, h("table", { class: "trazabilidad" },
-          h("thead", {}, h("tr", {}, ["Historia", "Cuándo", "Diseña y programa", "Prueba y documenta", "Depende de", "Estado"].map((x) => h("th", { text: x })))),
+          h("thead", {}, h("tr", {}, ["Historia", "Cuándo y orden", "Diseña y programa", "Prueba y documenta", "Depende de", "Estado"].map((x) => h("th", { text: x })))),
           h("tbody", {}, filas)))));
   }
 
@@ -471,8 +490,8 @@
         h("h2", { text: "Rutina de cada semana de trabajo" }),
         lista("ol", [
           "Lunes: planning con Kevin (cada historia se divide en tareas Doc, Cod y QA y se estima en puntos), acuerdo de contratos entre los dueños y diseño de las historias del primer sprint de la semana.",
-          "Historias del primer sprint: se programan de lunes a miércoles y se prueban de miércoles a jueves.",
-          "Historias del segundo sprint: se diseñan el miércoles, se programan de miércoles a viernes y se prueban de viernes a domingo.",
+          "El orden de integración de la semana (en la pestaña Tareas) dice qué historia va primero: si tu historia depende de otra de la misma semana, la programas contra los contratos acordados y la integras después de esa.",
+          "Tramo 1 (Lun–Mar), tramo 2 (Mié–Jue) y tramo 3 (Vie–Dom): cada historia se programa en su tramo y su pareja la prueba justo después.",
           "Todos los días, daily en el grupo (qué hice, qué haré y qué me bloquea) y Adriana actualiza la hoja de métricas.",
           "Viernes: review con Ariel, que acepta o devuelve cada historia; retro y actas con Kevin. El domingo, merge a main.",
         ])),
