@@ -509,7 +509,7 @@
       h("div", { class: "bloque" },
         h("h2", { text: "Por definir" }),
         lista("ul", [
-          "La base de datos: es una decisión de arquitectura (Spring Boot y Angular ya están decididos).",
+          "La base de datos: la propuesta es PostgreSQL (arquitectura propuesta y despliegue en AWS del repositorio); falta confirmarla en equipo.",
           "Los patrones de arquitectura que se van a aplicar (además de las capas y Entity frente a DTO).",
           "Las fechas reales de cada sprint para el informe: cada semana tiene dos sprints del backlog.",
           "Duración y formato de los videos (preguntarle al profesor).",

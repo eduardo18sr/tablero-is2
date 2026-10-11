@@ -17,7 +17,7 @@
     { id: "p4", nombre: "Kevin Chan", rolScrum: "Scrum Master", pareja: "p1",
       capitulos: "2, 4 y 13 (metodología, sprints y anexos)", rol: "Facilita planning, dailies, review y retro; redacta las actas y cierra cada release." },
     { id: "p5", nombre: "Sebastian Garate", rolScrum: "Developer (Dev4)", pareja: "p2",
-      capitulos: "10 y 12 (pruebas y repositorio)", rol: "Frontend base en Angular, pruebas automáticas, README y ZIP de entrega." },
+      capitulos: "10 y 12 (pruebas y repositorio)", rol: "Frontend base en React, pruebas automáticas, README y ZIP de entrega." },
     { id: "p6", nombre: "Ariel Enriquez", rolScrum: "Product Owner", pareja: "p3",
       capitulos: "1 y 5 (visión y requisitos)", rol: "Prioriza el backlog, acepta cada historia en la review y resuelve las dudas de alcance." },
   ];
@@ -148,7 +148,7 @@
       { id: "6.1", titulo: "Stakeholders", que: "Quién influye en la arquitectura y qué le preocupa.", cuando: "inicio" },
       { id: "6.2", titulo: "Metas de la arquitectura", que: "Qué debe lograr la arquitectura y por qué.", cuando: "inicio" },
       { id: "6.3", titulo: "Escenarios de atributos de calidad", que: "Escenarios medibles de seguridad, desempeño, disponibilidad, etc.", cuando: "inicio" },
-      { id: "6.4", titulo: "Restricciones", que: "Spring Boot y Angular obligatorios, tiempo, PCI DSS y protección de datos personales.", cuando: "inicio" },
+      { id: "6.4", titulo: "Restricciones", que: "Spring Boot y React decididos, base de datos relacional, PCI DSS, protección de datos personales y tiempo.", cuando: "inicio" },
       { id: "6.5", titulo: "Componentes y estilos arquitectónicos", que: "Componentes, tecnología y estilo (capas) con su justificación.", cuando: "codigo" },
       { id: "6.6", titulo: "Vista funcional", que: "Diagrama de casos de uso y tablas historia ↔ caso de uso ↔ requisito.", cuando: "codigo" },
       { id: "6.7", titulo: "Vista lógica", que: "Diagrama de paquetes o componentes y responsabilidades de cada capa.", cuando: "codigo" },
@@ -208,7 +208,7 @@
       detalle: "Una fila por día con los puntos planificados, completados y restantes, y una pestaña por sprint. De ahí salen el Burn Up y el Burn Down, que deben ser datos reales." },
     { id: "s7-arquitectura", semana: "s7", personas: ["p1", "p3"], tipo: "Diseño", titulo: "Acordar la arquitectura base y elegir la base de datos",
       secciones: ["6.4", "6.5", "6.7", "9.2"],
-      detalle: "Spring Boot (backend) y Angular (frontend) están decididos. Falta elegir la base de datos: es una decisión de arquitectura, así que se anotan las alternativas y el criterio para las secciones 6.4 y 6.10. Núcleo del backend separado de la API REST, y la API expone DTO, nunca entidades." },
+      detalle: "Spring Boot (backend) y React (frontend) están decididos. Para la base de datos, la propuesta es PostgreSQL (arquitectura-propuesta.md y despliegue en AWS del repositorio); falta confirmarla en equipo. Como es una decisión de arquitectura, se anotan las alternativas y el criterio para las secciones 6.4 y 6.10. Núcleo del backend separado de la API REST, y la API expone DTO, nunca entidades." },
     { id: "s7-contexto-ia", semana: "s7", personas: ["p1"], tipo: "Código", titulo: "Llevar proyecto.md al repositorio como AGENTS.md",
       secciones: ["7.1"],
       detalle: "Copiar la especificación (pestaña Especificación) a la raíz del repositorio del proyecto como AGENTS.md, completando la base de datos elegida y la estructura real de paquetes. Todos los asistentes de IA la leen, y así el código sale consistente aunque lo pidan 6 personas distintas." },
@@ -220,7 +220,7 @@
     { id: "s8-bd", semana: "s8", personas: ["p3"], tipo: "Código", titulo: "Modelo y script de la base de datos",
       secciones: ["9.2", "9.3"],
       detalle: "Tablas de las 28 historias (usuarios, roles, estados de cuenta, documentos, espacios, horarios, bloqueos, reservas, pagos, reembolsos, cuentas bancarias, liquidaciones, reseñas, reclamos, reportes y auditoría), con la restricción única por espacio y bloque (HU-12). Datos semilla para probar y grabar las demos." },
-    { id: "s8-frontend-base", semana: "s8", personas: ["p5"], tipo: "Código", titulo: "Frontend base en Angular y pruebas automáticas",
+    { id: "s8-frontend-base", semana: "s8", personas: ["p5"], tipo: "Código", titulo: "Frontend base en React y pruebas automáticas",
       secciones: ["6.8", "10.1"],
       detalle: "Rutas, layout, guardas por rol y cliente HTTP hacia la API. Dejar configuradas las pruebas unitarias del backend (JUnit) y del frontend para que cada historia agregue las suyas." },
     { id: "s8-spike-pago", semana: "s8", personas: ["p3"], tipo: "Código", hu: ["HU-13", "HU-16"], titulo: "Spike de la pasarela de pago en modo de prueba",
@@ -394,11 +394,11 @@
     ],
     prompts: [
       { nombre: "Diseñar una historia", paso: "Diseñar", texto:
-"Lee la especificación del proyecto (AGENTS.md / proyecto.md). Vamos a diseñar la historia HU-XX antes de programarla.\nHistoria, criterios Gherkin y STRIDE:\n<pegar desde la Especificación o el Excel>\n\nPropón, sin escribir código todavía:\n1. El caso de uso (actor, flujo principal y flujos alternos).\n2. Un diagrama de secuencia en PlantUML del flujo principal y otro del caso de error, respetando las capas Controller → Service → Repository y usando DTO en la API.\n3. Los endpoints REST con método, ruta, DTO de entrada y de salida, y códigos de respuesta.\n4. Las clases nuevas o modificadas en Spring Boot y los componentes de Angular.\nSi algún criterio es ambiguo, pregúntame antes de asumir." },
+"Lee la especificación del proyecto (AGENTS.md / proyecto.md). Vamos a diseñar la historia HU-XX antes de programarla.\nHistoria, criterios Gherkin y STRIDE:\n<pegar desde la Especificación o el Excel>\n\nPropón, sin escribir código todavía:\n1. El caso de uso (actor, flujo principal y flujos alternos).\n2. Un diagrama de secuencia en PlantUML del flujo principal y otro del caso de error, respetando las capas Controller → Service → Repository y usando DTO en la API.\n3. Los endpoints REST con método, ruta, DTO de entrada y de salida, y códigos de respuesta.\n4. Las clases nuevas o modificadas en Spring Boot y los componentes de React.\nSi algún criterio es ambiguo, pregúntame antes de asumir." },
       { nombre: "Programar", paso: "Programar", texto:
 "Lee la especificación del proyecto (AGENTS.md / proyecto.md). Implementa la historia HU-XX siguiendo exactamente este diseño aprobado:\n<pegar el diseño revisado>\n\nIncluye las validaciones de cada criterio y los controles STRIDE de la historia. Haz cambios pequeños y explica qué cambia en cada archivo. No toques código de otras historias sin avisar." },
       { nombre: "Pruebas", paso: "Probar y documentar", texto:
-"Lee la especificación del proyecto (AGENTS.md / proyecto.md). Para la historia HU-XX con estos criterios:\n<pegar criterios Gherkin>\ny este código:\n<pegar o indicar archivos>\n\n1. Escribe pruebas unitarias con JUnit (y del componente de Angular si aplica): al menos una por criterio, incluido el caso de error.\n2. Arma una tabla de casos de caja negra: datos de entrada, resultado esperado y cómo verificarlo." },
+"Lee la especificación del proyecto (AGENTS.md / proyecto.md). Para la historia HU-XX con estos criterios:\n<pegar criterios Gherkin>\ny este código:\n<pegar o indicar archivos>\n\n1. Escribe pruebas unitarias con JUnit (y de los componentes de React si aplica, por ejemplo con Jest y React Testing Library): al menos una por criterio, incluido el caso de error.\n2. Arma una tabla de casos de caja negra: datos de entrada, resultado esperado y cómo verificarlo." },
       { nombre: "Redactar una sección del informe", paso: "Informe", texto:
 "Redacta la sección X.Y del informe de nuestro proyecto (Marketplace de alquiler de espacios) siguiendo esta instrucción de la plantilla:\n<pegar la instrucción de la plantilla>\n\nUsa SOLO estos datos reales:\n<pegar acta, métricas, capturas descritas, código, etc.>\n\nSi falta información, no la inventes: escribe [FALTA: ...] en ese lugar. Tono formal, en español, sin relleno." },
       { nombre: "Correspondencia diagrama-código", paso: "Capítulo 8", texto:

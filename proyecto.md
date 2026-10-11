@@ -35,14 +35,15 @@ Marketplace web para alquilar espacios deportivos y para eventos (canchas, estad
 | Pieza | Decisión |
 | --- | --- |
 | Backend | **Spring Boot (Java)**, programación orientada a objetos |
-| Frontend | **Angular** |
-| Base de datos | **[POR DEFINIR]**: es una decisión de arquitectura pendiente. Cuando se elija, actualizar esta línea y justificarla en las secciones 6.4 y 6.10 del informe |
+| Frontend | **React** (aplicación de una sola página que consume la API REST) |
+| Base de datos | **PostgreSQL** (propuesta; **por confirmar en equipo**). Justificación en `arquitectura-propuesta.md`; va en las secciones 6.4 y 6.10 del informe |
+| Despliegue | Propuesta en AWS: SPA React en S3 con CloudFront y WAF, ALB, Spring Boot en ECS Fargate, RDS PostgreSQL, S3 privado, SES y Secrets Manager (`4_Infraestructure/arquitectura-aws.html` en el repositorio) |
 | Pagos | Pasarela certificada PCI DSS en **modo de prueba** (checkout de la pasarela + webhook con firma verificada) |
 | Diagramas | Herramienta CASE del curso (se entregan los archivos editables). La IA puede proponerlos en PlantUML |
 
 **Reglas de arquitectura (obligatorias):**
 
-1. **Arquitectura en capas.** `Controller → Service → Repository`, con entidades en el núcleo.
+1. **Arquitectura en capas (N-capas orientada al dominio), como monolito modular** desplegado en 3 niveles: React → Spring Boot → base de datos. Patrón MVC en el backend (Spring MVC) y enfoque DDD ligero (cada épica es un contexto). Dentro de cada módulo: `Controller → Service → Repository`, con entidades en el núcleo. Detalle y justificación en `arquitectura-propuesta.md`.
 2. **El núcleo del backend va separado de la API REST.** La lógica de negocio y el acceso a datos no dependen de la web: la API es un cliente más del núcleo.
 3. **Entity frente a DTO.** Las entidades nunca salen del backend: la API recibe y devuelve DTO, solo con los campos necesarios. Nunca se exponen contraseñas, documentos, datos bancarios ni datos de tarjeta.
 4. **Un paquete por módulo**, alineado con las épicas: `cuentas`, `espacios`, `busqueda`, `reservas`, `pagos`, `administracion`. Cada uno tiene `controller`, `service`, `repository`, `entity` y `dto`.
@@ -801,4 +802,4 @@ Salen de los sprints que se graban en video: el **Sprint 4 del R1** y el **Sprin
 | HU-23 · Filtros de búsqueda por precio, capacidad y características | Sebastian Garate | Decorator | Decorator: cada filtro (precio máximo, capacidad mínima, característica) envuelve a la búsqueda base de HU-10 y se pueden combinar libremente, sin una subclase por cada combinación de filtros. |
 | HU-25 · Recordatorio de reserva por correo | Jorge Quispe | Factory Method, Adapter | Factory Method: crear el correo adecuado según el evento (recordatorio, pago confirmado, cancelación); solo el recordatorio respeta la preferencia de desactivarlo. Adapter para el proveedor de correo, que así se puede cambiar sin tocar el dominio. |
 
-Al diseñar estas historias, pide a tu IA que aplique estos patrones y que lo muestre en el diagrama de clases y en el de secuencia. Los patrones de arquitectura se agregarán aquí cuando el equipo los defina.
+Al diseñar estas historias, pide a tu IA que aplique estos patrones y que lo muestre en el diagrama de clases y en el de secuencia. Los estilos, patrones y enfoques de arquitectura están en la sección 3 y en `arquitectura-propuesta.md`.
