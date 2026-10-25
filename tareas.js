@@ -27,7 +27,7 @@
     "HU-01": "p1", "HU-02": "p2", "HU-03": "p1", "HU-04": "p3", "HU-05": "p4", "HU-06": "p6", "HU-07": "p5", "HU-08": "p5",
     "HU-09": "p1", "HU-10": "p5", "HU-11": "p2", "HU-12": "p3", "HU-13": "p3", "HU-14": "p2", "HU-15": "p4", "HU-16": "p6",
     "HU-17": "p1", "HU-18": "p6", "HU-19": "p3", "HU-20": "p2", "HU-21": "p5", "HU-22": "p4",
-    "HU-23": "p5", "HU-24": "p2", "HU-25": "p1", "HU-26": "p6", "HU-27": "p4", "HU-28": "p3",
+    "HU-23": "p5", "HU-24": "p6", "HU-25": "p1", "HU-26": "p2", "HU-27": "p4", "HU-28": "p3",
   };
   for (const p of personas) p.historias = Object.keys(asignacion).filter((c) => asignacion[c] === p.id);
 
@@ -35,7 +35,8 @@
   const sprintsVideo = [4, 7];
 
   // Las 6 historias que se documentan a fondo (una por persona), elegidas por los patrones de diseño
-  // del curso que mejor encajan en ellas. Todas están en los sprints del video.
+  // del curso que mejor encajan en ellas. Todas están en los sprints del video: tres del Release 1 (sprint 4)
+  // y tres del Release 2 (sprint 7).
   const documentadas = {
     "HU-13": { patrones: ["Adapter", "Factory Method", "Facade"],
       porque: "Adapter: una interfaz propia PasarelaPago y un adaptador que traduce la API de la pasarela (checkout y verificación de la firma del webhook), para que el dominio no dependa del proveedor. Factory Method para crear la pasarela según la configuración (sandbox o real) y Facade (CheckoutFacade) para el flujo reserva vigente → monto en servidor → checkout." },
@@ -43,10 +44,10 @@
       porque: "Iterator: recorrer las reservas del usuario separadas en próximas y pasadas sin exponer la colección ni la consulta. DAO/Repository: consultas filtradas siempre por el usuario de la sesión (control STRIDE E/I)." },
     "HU-15": { patrones: ["Strategy"],
       porque: "Strategy: una interfaz PoliticaReembolso con una estrategia por caso (usuario con 48 h o más → 100 %, usuario con menos de 48 h → 0 %, arrendador → 100 %). El servicio elige la estrategia sin if por tipo, y si la política deja de ser fija solo se agrega una estrategia." },
-    "HU-16": { patrones: ["Command", "Adapter"],
-      porque: "Command: cada reembolso es un objeto (SolicitudReembolso) con ejecutar(), que se registra, es idempotente y se puede reintentar con el botón del admin cuando falla. Reutiliza el Adapter de la pasarela de HU-13." },
     "HU-23": { patrones: ["Decorator"],
       porque: "Decorator: cada filtro (precio máximo, capacidad mínima, característica) envuelve a la búsqueda base de HU-10 y se pueden combinar libremente, sin una subclase por cada combinación de filtros." },
+    "HU-24": { patrones: ["Decorator", "DAO"],
+      porque: "Decorator: un ServicioResenas base publica la reseña (valida que la reserva sea del usuario, esté confirmada, ya haya pasado, esté dentro de los 14 días y no tenga reseña previa; guarda y actualiza el promedio), y los controles STRIDE se agregan como decoradores combinables sin tocarlo: SanitizacionDecorator limpia el texto antes de delegar (T) y AuditoriaDecorator registra la creación después (R). La moderación de HU-27 puede sumar otro decorador. DAO/Repository: ResenaRepository con existePorReserva y promedioPorEspacio; la validación consulta las reservas reales del usuario (de HU-14), nunca lo que mande el cliente (S/T)." },
     "HU-25": { patrones: ["Factory Method", "Adapter"],
       porque: "Factory Method: crear el correo adecuado según el evento (recordatorio, pago confirmado, cancelación); solo el recordatorio respeta la preferencia de desactivarlo. Adapter para el proveedor de correo, que así se puede cambiar sin tocar el dominio." },
   };

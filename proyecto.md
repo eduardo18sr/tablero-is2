@@ -2,7 +2,7 @@
 
 > **Para personas y asistentes de IA.** Lee este documento completo antes de diseñar, programar o redactar algo del proyecto.
 > Si una instrucción de un prompt contradice esta especificación, manda la especificación y hay que avisar al equipo.
-> Generado el 2026-10-11 desde el tablero del equipo (tablero-is2). En el repositorio del proyecto vive como `AGENTS.md`.
+> Generado el 2026-10-25 desde el tablero del equipo (tablero-is2). En el repositorio del proyecto vive como `AGENTS.md`.
 
 ## 1. Qué es el producto
 
@@ -20,11 +20,11 @@ Marketplace web para alquilar espacios deportivos y para eventos (canchas, estad
 | Persona | Rol Scrum | Historias que diseña y programa | Su pareja (prueba sus historias) |
 | --- | --- | --- | --- |
 | Jorge Quispe | Developer (Dev1) | HU-01, HU-03, HU-09, HU-17, HU-25 | Kevin Chan |
-| Adriana Callupe | Developer (Dev3) | HU-02, HU-11, HU-14, HU-20, HU-24 | Sebastian Garate |
+| Adriana Callupe | Developer (Dev3) | HU-02, HU-11, HU-14, HU-20, HU-26 | Sebastian Garate |
 | Eduardo Saldaña | Developer (Dev2) | HU-04, HU-12, HU-13, HU-19, HU-28 | Ariel Enriquez |
 | Kevin Chan | Scrum Master | HU-05, HU-15, HU-22, HU-27 | Jorge Quispe |
 | Sebastian Garate | Developer (Dev4) | HU-07, HU-08, HU-10, HU-21, HU-23 | Adriana Callupe |
-| Ariel Enriquez | Product Owner | HU-06, HU-16, HU-18, HU-26 | Eduardo Saldaña |
+| Ariel Enriquez | Product Owner | HU-06, HU-16, HU-18, HU-24 | Eduardo Saldaña |
 
 - El **Product Owner** (Ariel) prioriza el backlog y acepta cada historia en la review.
 - El **Scrum Master** (Kevin) facilita las ceremonias y redacta las actas.
@@ -485,8 +485,9 @@ Como usuario, necesito filtrar los resultados por precio máximo, capacidad mín
 #### HU-24 · Reseñas y calificaciones
 
 - **Release 2 · Sprint 7** (semana 11) · tamaño M · depende de: HU-14
-- **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
+- **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
 - **Orden 1 de 2** en su semana · se programa Lun–Mar
+- **Se documenta a fondo (capítulo 8).** Patrones: Decorator, DAO.
 - **Sale en el video** de su release.
 
 Como usuario que usó un espacio, necesito calificarlo de 1 a 5 y dejar un comentario, para ayudar a otros a elegir con confianza.
@@ -627,7 +628,6 @@ Como usuario, necesito pagar mi reserva pendiente con tarjeta, para confirmarla.
 - **Release 1 · Sprint 4** (semana 9) · tamaño S · depende de: HU-13, HU-15
 - **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
 - **Orden 6 de 6** en su semana · se programa Vie–Dom · se integra después de HU-13, HU-15
-- **Se documenta a fondo (capítulo 8).** Patrones: Command, Adapter.
 - **Sale en el video** de su release.
 
 Como usuario, necesito recibir automáticamente el reembolso que corresponde cuando se cancela mi reserva, para recuperar mi dinero sin tener que reclamarlo.
@@ -750,7 +750,7 @@ Como administrador, necesito buscar una cuenta y suspenderla o reactivarla, para
 #### HU-26 · Reclamos sobre una reserva
 
 - **Release 2 · Sprint 8** (semana 11) · tamaño M · depende de: HU-14, HU-16, HU-19
-- **Programa:** Ariel Enriquez · **Prueba y documenta:** Eduardo Saldaña
+- **Programa:** Adriana Callupe · **Prueba y documenta:** Sebastian Garate
 - **Orden 1 de 2** en su semana · se programa Lun–Mar
 
 Como usuario, necesito reportar un problema con una reserva (espacio cerrado, distinto a lo publicado), para que la plataforma lo resuelva y, si corresponde, me devuelva el dinero.
@@ -798,8 +798,8 @@ Salen de los sprints que se graban en video: el **Sprint 4 del R1** y el **Sprin
 | HU-13 · Pago con tarjeta | Eduardo Saldaña | Adapter, Factory Method, Facade | Adapter: una interfaz propia PasarelaPago y un adaptador que traduce la API de la pasarela (checkout y verificación de la firma del webhook), para que el dominio no dependa del proveedor. Factory Method para crear la pasarela según la configuración (sandbox o real) y Facade (CheckoutFacade) para el flujo reserva vigente → monto en servidor → checkout. |
 | HU-14 · Mis reservas | Adriana Callupe | Iterator, DAO | Iterator: recorrer las reservas del usuario separadas en próximas y pasadas sin exponer la colección ni la consulta. DAO/Repository: consultas filtradas siempre por el usuario de la sesión (control STRIDE E/I). |
 | HU-15 · Cancelación de reservas | Kevin Chan | Strategy | Strategy: una interfaz PoliticaReembolso con una estrategia por caso (usuario con 48 h o más → 100 %, usuario con menos de 48 h → 0 %, arrendador → 100 %). El servicio elige la estrategia sin if por tipo, y si la política deja de ser fija solo se agrega una estrategia. |
-| HU-16 · Reembolso automático | Ariel Enriquez | Command, Adapter | Command: cada reembolso es un objeto (SolicitudReembolso) con ejecutar(), que se registra, es idempotente y se puede reintentar con el botón del admin cuando falla. Reutiliza el Adapter de la pasarela de HU-13. |
 | HU-23 · Filtros de búsqueda por precio, capacidad y características | Sebastian Garate | Decorator | Decorator: cada filtro (precio máximo, capacidad mínima, característica) envuelve a la búsqueda base de HU-10 y se pueden combinar libremente, sin una subclase por cada combinación de filtros. |
+| HU-24 · Reseñas y calificaciones | Ariel Enriquez | Decorator, DAO | Decorator: un ServicioResenas base publica la reseña (valida que la reserva sea del usuario, esté confirmada, ya haya pasado, esté dentro de los 14 días y no tenga reseña previa; guarda y actualiza el promedio), y los controles STRIDE se agregan como decoradores combinables sin tocarlo: SanitizacionDecorator limpia el texto antes de delegar (T) y AuditoriaDecorator registra la creación después (R). La moderación de HU-27 puede sumar otro decorador. DAO/Repository: ResenaRepository con existePorReserva y promedioPorEspacio; la validación consulta las reservas reales del usuario (de HU-14), nunca lo que mande el cliente (S/T). |
 | HU-25 · Recordatorio de reserva por correo | Jorge Quispe | Factory Method, Adapter | Factory Method: crear el correo adecuado según el evento (recordatorio, pago confirmado, cancelación); solo el recordatorio respeta la preferencia de desactivarlo. Adapter para el proveedor de correo, que así se puede cambiar sin tocar el dominio. |
 
 Al diseñar estas historias, pide a tu IA que aplique estos patrones y que lo muestre en el diagrama de clases y en el de secuencia. Los estilos, patrones y enfoques de arquitectura están en la sección 3 y en `arquitectura-propuesta.md`.
